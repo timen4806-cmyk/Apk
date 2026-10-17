@@ -101,6 +101,7 @@ jobs:
   deploy-web:
     name: Deploy Web App to GitHub Pages
     runs-on: ubuntu-latest
+    continue-on-error: true
     if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' || github.event_name == 'workflow_dispatch'
     environment:
       name: github-pages

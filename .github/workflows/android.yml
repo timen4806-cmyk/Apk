@@ -7,6 +7,9 @@ on:
     branches: [ "main", "master" ]
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     name: Build & Package APK
@@ -48,9 +51,36 @@ jobs:
       - name: Build Debug APK
         run: ./gradlew assembleDebug --stacktrace --no-daemon
 
+      - name: Prepare Direct APK File
+        run: |
+          cp app/build/outputs/apk/debug/app-debug.apk app/build/outputs/apk/debug/Masjid-AtTaqwa-Penancangan.apk
+
       - name: Upload Debug APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: Masjid-AtTaqwa-Penancangan-APK
-          path: app/build/outputs/apk/debug/*.apk
+          path: app/build/outputs/apk/debug/Masjid-AtTaqwa-Penancangan.apk
           retention-days: 14
+
+      - name: Publish Direct Download APK via GitHub Releases
+        uses: softprops/action-gh-release@v2
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' || github.event_name == 'workflow_dispatch'
+        with:
+          tag_name: latest-build
+          name: "Masjid Jami' At-Taqwa Penancangan (APK Siap Pasang)"
+          body: |
+            ### 🕌 Download Langsung File APK (Android)
+            Unduh file **`Masjid-AtTaqwa-Penancangan.apk`** langsung dari tautan Assets di bawah ini. Tidak perlu ekstrak file zip!
+
+            - **Fitur Utama:**
+              - Jadwal Shalat Kemenag RI (Penancangan - Serang)
+              - Jadwal Petugas Shalat 5 Waktu, Jum'at & Hari Raya
+              - Jam Digital & Hitung Mundur Iqomah
+              - Running Text Pengumuman Marquee
+              - Mode TV Digital Signage Layar Lebar
+              - Transparansi Kas & Donasi Digital QRIS
+          files: app/build/outputs/apk/debug/Masjid-AtTaqwa-Penancangan.apk
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

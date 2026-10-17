@@ -263,4 +263,64 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun triggerAgendaReminderNow(item: AgendaItem) {
         NotificationHelper.showAgendaReminder(getApplication(), item.title, "${item.date} (${item.time})", item.speaker)
     }
+
+    // Admin Security & Authentication
+    private val securityPrefs = getApplication<Application>().getSharedPreferences("masjid_security_prefs", android.content.Context.MODE_PRIVATE)
+
+    private val _isAdminLoggedIn = MutableStateFlow(false)
+    val isAdminLoggedIn: StateFlow<Boolean> = _isAdminLoggedIn.asStateFlow()
+
+    private val _failedAttempts = MutableStateFlow(0)
+    val failedAttempts: StateFlow<Int> = _failedAttempts.asStateFlow()
+
+    private val _isLockedOut = MutableStateFlow(false)
+    val isLockedOut: StateFlow<Boolean> = _isLockedOut.asStateFlow()
+
+    private val _lockoutTimerSeconds = MutableStateFlow(0)
+    val lockoutTimerSeconds: StateFlow<Int> = _lockoutTimerSeconds.asStateFlow()
+
+    fun verifyAdminPin(pin: String): Boolean {
+        if (_isLockedOut.value) return false
+
+        val storedPin = securityPrefs.getString("admin_pin_code", "2026") ?: "2026"
+        if (pin == storedPin) {
+            _isAdminLoggedIn.value = true
+            _failedAttempts.value = 0
+            return true
+        } else {
+            val newFail = _failedAttempts.value + 1
+            _failedAttempts.value = newFail
+            if (newFail >= 3) {
+                triggerLockout()
+            }
+            return false
+        }
+    }
+
+    private fun triggerLockout() {
+        _isLockedOut.value = true
+        _lockoutTimerSeconds.value = 30
+        viewModelScope.launch {
+            for (i in 30 downTo 1) {
+                _lockoutTimerSeconds.value = i
+                delay(1000L)
+            }
+            _isLockedOut.value = false
+            _failedAttempts.value = 0
+            _lockoutTimerSeconds.value = 0
+        }
+    }
+
+    fun changeAdminPin(oldPin: String, newPin: String): Boolean {
+        val storedPin = securityPrefs.getString("admin_pin_code", "2026") ?: "2026"
+        if (oldPin == storedPin && newPin.length >= 4) {
+            securityPrefs.edit().putString("admin_pin_code", newPin).apply()
+            return true
+        }
+        return false
+    }
+
+    fun logoutAdmin() {
+        _isAdminLoggedIn.value = false
+    }
 }

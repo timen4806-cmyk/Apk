@@ -31,6 +31,7 @@ fun MosqueHeader(
     isLandscapeForced: Boolean = false,
     onToggleDarkMode: () -> Unit,
     onToggleOrientation: () -> Unit = {},
+    onShareWebLink: () -> Unit = {},
     onEnterTvMode: () -> Unit,
     onNotificationClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -137,6 +138,23 @@ fun MosqueHeader(
                             contentDescription = "Rotasi Landscape",
                             tint = if (isLandscapeForced) GoldAccent else Color.White,
                             modifier = Modifier.size(18.dp)
+                        )
+                    }
+
+                    // Share Web Link Button
+                    IconButton(
+                        onClick = onShareWebLink,
+                        modifier = Modifier
+                            .size(36.dp)
+                            .clip(CircleShape)
+                            .background(Color(0xFF13382B))
+                            .testTag("share_web_link_button")
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Share,
+                            contentDescription = "Bagikan Link Web",
+                            tint = GoldAccent,
+                            modifier = Modifier.size(17.dp)
                         )
                     }
 

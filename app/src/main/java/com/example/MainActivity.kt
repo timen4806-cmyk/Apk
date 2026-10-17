@@ -1,11 +1,16 @@
 package com.example
 
 import android.Manifest
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
+import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.view.WindowManager
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
@@ -13,6 +18,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -30,6 +36,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
@@ -105,6 +112,8 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun ResponsiveAppContent(viewModel: MainViewModel) {
+    var showShareWebDialog by remember { mutableStateOf(false) }
+
     BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
         val isLandscape = maxWidth > maxHeight || maxWidth >= 600.dp
         val isWideScreen = maxWidth >= 840.dp
@@ -112,10 +121,18 @@ fun ResponsiveAppContent(viewModel: MainViewModel) {
         if (isLandscape) {
             LandscapeResponsiveLayout(
                 viewModel = viewModel,
-                isWideScreen = isWideScreen
+                isWideScreen = isWideScreen,
+                onOpenShareWeb = { showShareWebDialog = true }
             )
         } else {
-            PortraitMobileLayout(viewModel = viewModel)
+            PortraitMobileLayout(
+                viewModel = viewModel,
+                onOpenShareWeb = { showShareWebDialog = true }
+            )
+        }
+
+        if (showShareWebDialog) {
+            WebAccessSecurityDialog(onDismiss = { showShareWebDialog = false })
         }
     }
 }
@@ -123,7 +140,8 @@ fun ResponsiveAppContent(viewModel: MainViewModel) {
 @Composable
 fun LandscapeResponsiveLayout(
     viewModel: MainViewModel,
-    isWideScreen: Boolean
+    isWideScreen: Boolean,
+    onOpenShareWeb: () -> Unit
 ) {
     val selectedTab by viewModel.selectedTab.collectAsState()
     val isDarkMode by viewModel.isDarkMode.collectAsState()
@@ -233,6 +251,21 @@ fun LandscapeResponsiveLayout(
                         verticalArrangement = Arrangement.spacedBy(6.dp),
                         modifier = Modifier.padding(bottom = 8.dp)
                     ) {
+                        IconButton(
+                            onClick = onOpenShareWeb,
+                            modifier = Modifier
+                                .size(34.dp)
+                                .clip(CircleShape)
+                                .background(Color(0xFF13382B))
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Language,
+                                contentDescription = "Akses Web",
+                                tint = GoldAccent,
+                                modifier = Modifier.size(16.dp)
+                            )
+                        }
+
                         IconButton(
                             onClick = { viewModel.setTvMode(true) },
                             modifier = Modifier
@@ -448,7 +481,10 @@ fun LandscapeResponsiveLayout(
 }
 
 @Composable
-fun PortraitMobileLayout(viewModel: MainViewModel) {
+fun PortraitMobileLayout(
+    viewModel: MainViewModel,
+    onOpenShareWeb: () -> Unit
+) {
     val selectedTab by viewModel.selectedTab.collectAsState()
     val isDarkMode by viewModel.isDarkMode.collectAsState()
     val isLandscapeForced by viewModel.isLandscapeForced.collectAsState()
@@ -477,6 +513,7 @@ fun PortraitMobileLayout(viewModel: MainViewModel) {
                 isLandscapeForced = isLandscapeForced,
                 onToggleDarkMode = { viewModel.setDarkMode(!isDarkMode) },
                 onToggleOrientation = { viewModel.toggleForceLandscape() },
+                onShareWebLink = onOpenShareWeb,
                 onEnterTvMode = { viewModel.setTvMode(true) },
                 onNotificationClick = { viewModel.triggerPrayerReminderNow() }
             )
@@ -554,6 +591,150 @@ fun PortraitMobileLayout(viewModel: MainViewModel) {
                 dailyOfficers = dailyOfficers,
                 announcements = announcements
             )
+        }
+    }
+}
+
+@Composable
+fun WebAccessSecurityDialog(onDismiss: () -> Unit) {
+    val context = LocalContext.current
+    val webUrl = "https://ais-pre-d26tsoajbpmfcu6el2a3bz-224789017914.asia-east1.run.app"
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        containerColor = Color(0xFF092017),
+        icon = {
+            Icon(
+                imageVector = Icons.Default.Language,
+                contentDescription = null,
+                tint = GoldAccent,
+                modifier = Modifier.size(36.dp)
+            )
+        },
+        title = {
+            Text(
+                text = "Akses Web Resmi Masjid Jami' At-Taqwa",
+                color = Color.White,
+                fontSize = 17.sp,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center
+            )
+        },
+        text = {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Text(
+                    text = "Aplikasi ini dapat diakses langsung oleh seluruh jemaah melalui link web di bawah ini tanpa perlu mengunduh atau menginstal file APK:",
+                    color = Color(0xFFCBD5E1),
+                    fontSize = 12.sp,
+                    lineHeight = 17.sp
+                )
+
+                // Web URL Box
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(Color(0xFF071911))
+                        .border(1.dp, GoldAccent.copy(alpha = 0.5f), RoundedCornerShape(8.dp))
+                        .padding(12.dp)
+                ) {
+                    Text(
+                        text = webUrl,
+                        color = GoldAccent,
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
+
+                // Security Features List
+                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    SecurityFeatureRow(
+                        icon = Icons.Default.Lock,
+                        title = "Enkripsi Penuh HTTPS (SSL/TLS)",
+                        desc = "Aman diakses publik tanpa risiko intersepsi data."
+                    )
+                    SecurityFeatureRow(
+                        icon = Icons.Default.Security,
+                        title = "Dashboard Admin Terproteksi PIN",
+                        desc = "Akses kelola jadwal & kas terkunci dengan proteksi anti-brute force."
+                    )
+                    SecurityFeatureRow(
+                        icon = Icons.Default.Devices,
+                        title = "Responsif di Semua Perangkat",
+                        desc = "Otomatis menyesuaikan layar HP, Tablet, Laptop, PC, dan Smart TV."
+                    )
+                }
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = {
+                    val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                    val clip = ClipData.newPlainText("Link Web Masjid At-Taqwa", webUrl)
+                    clipboard.setPrimaryClip(clip)
+                    Toast.makeText(context, "Link web berhasil disalin ke clipboard!", Toast.LENGTH_SHORT).show()
+                },
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0F5A47))
+            ) {
+                Icon(imageVector = Icons.Default.ContentCopy, contentDescription = null, modifier = Modifier.size(16.dp))
+                Spacer(modifier = Modifier.width(6.dp))
+                Text("Salin Link Web", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+            }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = {
+                    try {
+                        val sendIntent = Intent().apply {
+                            action = Intent.ACTION_SEND
+                            putExtra(Intent.EXTRA_TEXT, "🕌 Buka Aplikasi Masjid Jami' At-Taqwa Penancangan secara langsung via link web:\n$webUrl")
+                            type = "text/plain"
+                        }
+                        context.startActivity(Intent.createChooser(sendIntent, "Bagikan Link Web Masjid"))
+                    } catch (e: Exception) {
+                        onDismiss()
+                    }
+                }
+            ) {
+                Icon(imageVector = Icons.Default.Share, contentDescription = null, tint = GoldAccent, modifier = Modifier.size(16.dp))
+                Spacer(modifier = Modifier.width(4.dp))
+                Text("Bagikan", color = GoldAccent, fontSize = 12.sp)
+            }
+        }
+    )
+}
+
+@Composable
+fun SecurityFeatureRow(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    title: String,
+    desc: String
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier
+                .size(28.dp)
+                .clip(CircleShape)
+                .background(Color(0xFF0F3A2B)),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = GoldAccent,
+                modifier = Modifier.size(16.dp)
+            )
+        }
+        Spacer(modifier = Modifier.width(10.dp))
+        Column {
+            Text(text = title, color = Color.White, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+            Text(text = desc, color = Color(0xFF94A3B8), fontSize = 10.sp)
         }
     }
 }

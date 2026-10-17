@@ -103,17 +103,9 @@ jobs:
     runs-on: ubuntu-latest
     continue-on-error: true
     if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' || github.event_name == 'workflow_dispatch'
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Setup Pages
-        id: pages
-        uses: actions/configure-pages@v5
-        continue-on-error: true
 
       - name: Prepare Web Directory
         run: |
@@ -123,13 +115,10 @@ jobs:
             cp -r public/* _site/ 2>/dev/null || true
           fi
 
-      - name: Upload Artifact
-        uses: actions/upload-pages-artifact@v3
+      - name: Deploy to gh-pages Branch
+        uses: peaceiris/actions-gh-pages@v4
         continue-on-error: true
         with:
-          path: '_site'
-
-      - name: Deploy to GitHub Pages
-        id: deployment
-        continue-on-error: true
-        uses: actions/deploy-pages@v4
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./_site
+          publish_branch: gh-pages

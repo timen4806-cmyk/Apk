@@ -198,37 +198,115 @@
           <p class="text-slate-300 text-xs">Laporan keuangan terbuka, transparan & akuntabel bagi seluruh jamaah.</p>
         </div>
 
-        <!-- QRIS & Bank Donasi -->
+        <!-- QRIS & Bank Donasi Dinamis -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <!-- QRIS -->
           <div class="bg-[#071911] border border-emerald-900/60 rounded-xl p-5 flex flex-col items-center text-center">
-            <span class="text-amber-400 font-bold text-xs mb-3">QRIS RESMI MASJID JAMI' AT-TAQWA</span>
-            <div class="bg-white p-3 rounded-lg w-44 h-44 flex flex-col items-center justify-center shadow-lg">
-              <span class="text-6xl text-slate-800">📱</span>
-              <span class="text-[10px] text-slate-800 font-bold mt-2">NMID: ID1020260012345</span>
+            <span class="text-amber-400 font-bold text-xs mb-2">QRIS RESMI MASJID JAMI' AT-TAQWA</span>
+            <div class="bg-white p-2.5 rounded-xl w-48 h-48 flex flex-col items-center justify-center shadow-lg cursor-pointer" onclick="showBankQrModal('QRIS', 'ID1020260012345', 'MASJID JAMI AT TAQWA PENANCANGAN')">
+              <img id="qrisImage" src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=QRIS:ID.CO.QRIS.WWW%0ANMID:ID1020260012345%0AMerchant:MASJID%20JAMI%20AT%20TAQWA%20PENANCANGAN%0AInfaq%20Sedekah" alt="QRIS Masjid At-Taqwa" class="w-36 h-36 object-contain" />
+              <span class="text-[10px] text-slate-800 font-bold mt-1">NMID: ID1020260012345</span>
             </div>
-            <p class="text-[11px] text-slate-400 mt-3">Mendukung BCA, BSI, Mandiri, GoPay, OVO, DANA, ShopeePay, LinkAja</p>
+            <p class="text-[11px] text-slate-300 font-semibold mt-2">Pindai dengan GoPay, OVO, DANA, BCA, BSI, Mandiri</p>
+            <button onclick="showBankQrModal('QRIS', 'ID1020260012345', 'MASJID JAMI AT TAQWA PENANCANGAN')" class="mt-3 bg-[#0f5a47] hover:bg-emerald-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg flex items-center space-x-1.5">
+              <span>🔍 Perbesar QRIS</span>
+            </button>
           </div>
 
           <!-- Bank Accounts -->
           <div class="bg-[#071911] border border-emerald-900/60 rounded-xl p-5 space-y-3 text-xs">
-            <span class="text-amber-400 font-bold block text-sm">Rekening Bank Resmi Masjid</span>
-            <div class="bg-[#0e241b] p-3 rounded-lg flex items-center justify-between">
-              <div>
-                <span class="text-amber-400 font-bold block">BSI (Bank Syariah Indonesia)</span>
-                <span class="font-mono text-white text-sm font-bold">7123-4567-89</span>
-                <span class="text-slate-400 block text-[10px]">a.n. DKM Masjid Jami At-Taqwa</span>
-              </div>
-              <button onclick="copyText('7123456789')" class="bg-[#0f5a47] text-white px-2.5 py-1.5 rounded hover:bg-emerald-600 font-medium text-[11px]">Salin</button>
+            <div class="flex items-center justify-between">
+              <span class="text-amber-400 font-bold text-sm">Rekening Bank Resmi Masjid</span>
+              <span class="text-[10px] bg-emerald-900/80 text-amber-300 px-2 py-0.5 rounded font-bold">QR Dinamis</span>
             </div>
-            <div class="bg-[#0e241b] p-3 rounded-lg flex items-center justify-between">
+
+            <!-- DANA E-Wallet -->
+            <div class="bg-[#071b2a] border border-blue-500/40 p-3 rounded-lg flex items-center justify-between">
               <div>
-                <span class="text-amber-400 font-bold block">Bank Muamalat</span>
-                <span class="font-mono text-white text-sm font-bold">101-002-3344</span>
-                <span class="text-slate-400 block text-[10px]">a.n. DKM Masjid Jami At-Taqwa</span>
+                <div class="flex items-center space-x-1.5">
+                  <span class="bg-[#118EEA] text-white text-[10px] font-black px-1.5 py-0.5 rounded">DANA</span>
+                  <span class="text-sky-300 font-bold">DANA Dompet Digital</span>
+                </div>
+                <span class="font-mono text-white text-base font-black tracking-wider block mt-1">0812-3456-7890</span>
+                <span class="text-slate-400 block text-[10px]">a.n. DKM Masjid Jami At-Taqwa Penancangan</span>
               </div>
-              <button onclick="copyText('1010023344')" class="bg-[#0f5a47] text-white px-2.5 py-1.5 rounded hover:bg-emerald-600 font-medium text-[11px]">Salin</button>
+              <div class="flex items-center space-x-1.5">
+                <button onclick="showBankQrModal('DANA Dompet Digital', '081234567890', 'DKM Masjid Jami At-Taqwa Penancangan', 'DANA')" class="bg-[#118EEA] hover:bg-blue-600 text-white px-2.5 py-1.5 rounded font-bold text-[11px]">QR</button>
+                <button onclick="copyText('081234567890')" class="bg-slate-700 hover:bg-slate-600 text-white px-2 py-1.5 rounded text-[11px]">Salin</button>
+              </div>
             </div>
+
+            <!-- BSI -->
+            <div class="bg-[#0e241b] border border-emerald-800/40 p-3 rounded-lg flex items-center justify-between">
+              <div>
+                <div class="flex items-center space-x-1.5">
+                  <span class="bg-teal-900/50 text-teal-300 text-[10px] font-black px-1.5 py-0.5 rounded">BSI</span>
+                  <span class="text-amber-400 font-bold">Bank Syariah Indonesia</span>
+                </div>
+                <span class="font-mono text-white text-base font-black tracking-wider block mt-1">7123-4567-89</span>
+                <span class="text-slate-400 block text-[10px]">a.n. DKM Masjid Jami At-Taqwa Penancangan</span>
+              </div>
+              <div class="flex items-center space-x-1.5">
+                <button onclick="showBankQrModal('Bank Syariah Indonesia (BSI)', '7123456789', 'DKM Masjid Jami At-Taqwa Penancangan', '451')" class="bg-[#0f5a47] hover:bg-emerald-600 text-amber-300 px-2.5 py-1.5 rounded font-bold text-[11px]">QR</button>
+                <button onclick="copyText('7123456789')" class="bg-slate-700 hover:bg-slate-600 text-white px-2 py-1.5 rounded text-[11px]">Salin</button>
+              </div>
+            </div>
+
+            <!-- Muamalat -->
+            <div class="bg-[#0e241b] border border-emerald-800/40 p-3 rounded-lg flex items-center justify-between">
+              <div>
+                <div class="flex items-center space-x-1.5">
+                  <span class="bg-purple-900/50 text-purple-300 text-[10px] font-black px-1.5 py-0.5 rounded">Muamalat</span>
+                  <span class="text-amber-400 font-bold">Bank Muamalat</span>
+                </div>
+                <span class="font-mono text-white text-base font-black tracking-wider block mt-1">101-002-3344</span>
+                <span class="text-slate-400 block text-[10px]">a.n. Masjid Jami At-Taqwa Penancangan</span>
+              </div>
+              <div class="flex items-center space-x-1.5">
+                <button onclick="showBankQrModal('Bank Muamalat', '1010023344', 'Masjid Jami At-Taqwa Penancangan', '147')" class="bg-[#0f5a47] hover:bg-emerald-600 text-amber-300 px-2.5 py-1.5 rounded font-bold text-[11px]">QR</button>
+                <button onclick="copyText('1010023344')" class="bg-slate-700 hover:bg-slate-600 text-white px-2 py-1.5 rounded text-[11px]">Salin</button>
+              </div>
+            </div>
+
+            <!-- BCA -->
+            <div class="bg-[#0e241b] border border-emerald-800/40 p-3 rounded-lg flex items-center justify-between">
+              <div>
+                <div class="flex items-center space-x-1.5">
+                  <span class="bg-blue-900/50 text-blue-300 text-[10px] font-black px-1.5 py-0.5 rounded">BCA</span>
+                  <span class="text-amber-400 font-bold">Bank Central Asia</span>
+                </div>
+                <span class="font-mono text-white text-base font-black tracking-wider block mt-1">5420-9876-54</span>
+                <span class="text-slate-400 block text-[10px]">a.n. Panitia Pembangunan At-Taqwa</span>
+              </div>
+              <div class="flex items-center space-x-1.5">
+                <button onclick="showBankQrModal('Bank Central Asia (BCA)', '5420987654', 'Panitia Pembangunan At-Taqwa', '014')" class="bg-[#0f5a47] hover:bg-emerald-600 text-amber-300 px-2.5 py-1.5 rounded font-bold text-[11px]">QR</button>
+                <button onclick="copyText('5420987654')" class="bg-slate-700 hover:bg-slate-600 text-white px-2 py-1.5 rounded text-[11px]">Salin</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- QR Code Dynamic Modal -->
+        <div id="bankQrModal" class="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4 hidden">
+          <div class="bg-[#071911] border-2 border-amber-500/50 rounded-2xl max-w-sm w-full p-5 text-center relative shadow-2xl">
+            <button onclick="closeBankQrModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-lg font-bold">✕</button>
+            <h4 id="modalBankTitle" class="text-amber-400 font-bold text-base">QR Transfer Bank</h4>
+            <p id="modalBankSubtitle" class="text-slate-300 text-xs mt-0.5"></p>
+            
+            <div class="my-4 bg-white p-3 rounded-xl inline-block shadow-lg border-2 border-emerald-600">
+              <img id="modalQrImg" src="" alt="QR Code Bank" class="w-48 h-48 object-contain mx-auto" />
+            </div>
+
+            <div class="bg-[#0e241b] rounded-lg p-2.5 text-xs text-left mb-3 flex items-center justify-between">
+              <div>
+                <span id="modalAccountNo" class="font-mono text-white font-bold text-sm block"></span>
+                <span id="modalAccountHolder" class="text-slate-400 text-[10px] block"></span>
+              </div>
+              <button id="modalCopyBtn" onclick="" class="bg-[#0f5a47] hover:bg-emerald-600 text-white text-[11px] font-bold px-2.5 py-1 rounded">Salin</button>
+            </div>
+
+            <p class="text-[10px] text-slate-400 mb-4">Pindai QR ini langsung dari aplikasi mobile banking atau kamera HP Anda untuk transfer infaq.</p>
+            <button onclick="closeBankQrModal()" class="w-full bg-slate-700 hover:bg-slate-600 text-white text-xs font-bold py-2 rounded-lg">Tutup</button>
           </div>
         </div>
       </div>
@@ -1030,6 +1108,30 @@
     function copyText(txt) {
       navigator.clipboard.writeText(txt);
       alert(`Nomor rekening ${txt} berhasil disalin!`);
+    }
+
+    function showBankQrModal(bankName, accountNo, holder, bankCode = '') {
+      const modal = document.getElementById('bankQrModal');
+      document.getElementById('modalBankTitle').textContent = bankName === 'QRIS' ? 'QRIS Resmi Masjid At-Taqwa' : `QR ${bankName}`;
+      document.getElementById('modalBankSubtitle').textContent = bankCode ? `Kode Bank: ${bankCode} • Penancangan, Serang` : 'Masjid Jami At-Taqwa Penancangan';
+      document.getElementById('modalAccountNo').textContent = accountNo;
+      document.getElementById('modalAccountHolder').textContent = `a.n. ${holder}`;
+      document.getElementById('modalCopyBtn').onclick = () => copyText(accountNo);
+
+      let payload = "";
+      if (bankName === 'QRIS') {
+        payload = `QRIS:ID.CO.QRIS.WWW\nNMID:${accountNo}\nMerchant:${holder}\nInfaq Sedekah Masjid At-Taqwa`;
+      } else {
+        payload = `DONASI MASJID JAMI' AT-TAQWA\nBank: ${bankName}\nNo Rekening: ${accountNo}\nAtas Nama: ${holder}\nKeperluan: Infaq & Sedekah Kas Masjid`;
+      }
+
+      const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent(payload)}`;
+      document.getElementById('modalQrImg').src = qrUrl;
+      modal.classList.remove('hidden');
+    }
+
+    function closeBankQrModal() {
+      document.getElementById('bankQrModal').classList.add('hidden');
     }
 
     function toggleTvMode() {

@@ -28,8 +28,13 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
-      - name: Grant Execute Permission to Gradlew
-        run: chmod +x gradlew
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Fix line endings and grant execute permission to Gradlew
+        run: |
+          sed -i 's/\r$//' gradlew || true
+          chmod +x gradlew
 
       - name: Setup Environment and Keystore Files
         run: |
@@ -37,6 +42,11 @@ jobs:
           if [ ! -f .env ]; then
             echo "Creating .env from .env.example..."
             cp .env.example .env
+          fi
+
+          # Accept SDK licenses if sdkmanager is available
+          if command -v sdkmanager >/dev/null 2>&1; then
+            yes | sdkmanager --licenses || true
           fi
 
           # Ensure debug.keystore exists (restore from base64 or generate)
@@ -66,6 +76,7 @@ jobs:
 
       - name: Publish Direct Download APK via GitHub Releases
         uses: softprops/action-gh-release@v2
+        continue-on-error: true
         if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' || github.event_name == 'workflow_dispatch'
         with:
           tag_name: latest-build
@@ -102,8 +113,6 @@ jobs:
         id: pages
         uses: actions/configure-pages@v5
         continue-on-error: true
-        with:
-          enablement: true
 
       - name: Prepare Web Directory
         run: |
@@ -115,6 +124,7 @@ jobs:
 
       - name: Upload Artifact
         uses: actions/upload-pages-artifact@v3
+        continue-on-error: true
         with:
           path: '_site'
 

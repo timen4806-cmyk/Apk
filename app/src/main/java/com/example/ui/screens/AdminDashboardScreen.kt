@@ -30,8 +30,10 @@ import com.example.data.model.DailyPrayerOfficer
 import com.example.data.model.EidSchedule
 import com.example.data.model.FridaySchedule
 import com.example.data.model.TransactionType
+import com.example.data.util.HijriCalendarHelper
 import com.example.ui.theme.GoldAccent
 import com.example.ui.theme.NightSurface
+import java.util.Calendar
 
 @Composable
 fun AdminDashboardScreen(
@@ -50,6 +52,8 @@ fun AdminDashboardScreen(
     val announcements by viewModel.announcements.collectAsState()
     val isCloudSynced by viewModel.isCloudSynced.collectAsState()
     val lastSyncTime by viewModel.lastSyncTime.collectAsState()
+    val hijriOffset by viewModel.hijriOffset.collectAsState()
+    val currentDateHijri by viewModel.currentDateHijri.collectAsState()
 
     // Security States
     val isAdminLoggedIn by viewModel.isAdminLoggedIn.collectAsState()
@@ -64,6 +68,7 @@ fun AdminDashboardScreen(
     var showEditEidDialog by remember { mutableStateOf<EidSchedule?>(null) }
     var showIqomahDurationsDialog by remember { mutableStateOf(false) }
     var showManualIqomahDialog by remember { mutableStateOf(false) }
+    var showEditHijriDialog by remember { mutableStateOf(false) }
     var showAddAnnouncementDialog by remember { mutableStateOf(false) }
     var showAddKasDialog by remember { mutableStateOf(false) }
     var showAddAgendaDialog by remember { mutableStateOf(false) }
@@ -550,6 +555,82 @@ fun AdminDashboardScreen(
                                 Icon(imageVector = Icons.Default.Settings, contentDescription = null, modifier = Modifier.size(14.dp))
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Text(text = "Edit Waktu Otomatis", fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Action 2E: Kalender Hijriyah & Penyesuaian Tanggal
+            item {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(containerColor = NightSurface),
+                    border = CardDefaults.outlinedCardBorder().copy(brush = Brush.horizontalGradient(listOf(Color(0xFF38BDF8), GoldAccent)))
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column {
+                                Text(
+                                    text = "Kalender Hijriyah & Koreksi Tanggal",
+                                    color = Color.White,
+                                    fontSize = 15.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                                Text(
+                                    text = "Sinkronisasi kalender Hijriyah & Ru'yatul Hilal",
+                                    color = Color(0xFF94A3B8),
+                                    fontSize = 11.sp
+                                )
+                            }
+                            IconButton(
+                                onClick = { showEditHijriDialog = true },
+                                modifier = Modifier
+                                    .size(36.dp)
+                                    .clip(CircleShape)
+                                    .background(Color(0xFF0F5A47))
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.DateRange,
+                                    contentDescription = "Edit Kalender Hijriah",
+                                    tint = GoldAccent,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(10.dp))
+
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(Color(0xFF071911))
+                                .padding(12.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column {
+                                Text(text = "Tanggal Hijriah Saat Ini", color = Color(0xFF94A3B8), fontSize = 11.sp)
+                                Text(text = currentDateHijri.ifEmpty { "5 Jumadil Awal 1448 H" }, color = GoldAccent, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                            }
+                            Column(horizontalAlignment = Alignment.End) {
+                                Text(text = "Koreksi Hari", color = Color(0xFF94A3B8), fontSize = 11.sp)
+                                Text(
+                                    text = if (hijriOffset == 0) "Standar (0 hr)" else "${if (hijriOffset > 0) "+$hijriOffset" else "$hijriOffset"} hari",
+                                    color = Color(0xFF38BDF8),
+                                    fontSize = 13.sp,
+                                    fontWeight = FontWeight.SemiBold
+                                )
                             }
                         }
                     }
@@ -1181,6 +1262,92 @@ fun AdminDashboardScreen(
             },
             dismissButton = {
                 TextButton(onClick = { showManualIqomahDialog = false }) {
+                    Text("Batal", color = Color(0xFF94A3B8))
+                }
+            }
+        )
+    }
+
+    // Dialog: Edit & Koreksi Kalender Hijriyah
+    if (showEditHijriDialog) {
+        var selectedOffset by remember { mutableIntStateOf(hijriOffset) }
+        val testCal = Calendar.getInstance()
+        val previewHijri = HijriCalendarHelper.getHijriDateString(testCal, selectedOffset)
+
+        AlertDialog(
+            onDismissRequest = { showEditHijriDialog = false },
+            containerColor = Color(0xFF092017),
+            title = {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(imageVector = Icons.Default.DateRange, contentDescription = null, tint = GoldAccent, modifier = Modifier.size(20.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(text = "Penyesuaian Kalender Hijriyah", color = GoldAccent, fontWeight = FontWeight.Bold)
+                }
+            },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Text(
+                        text = "Sesuaikan penanggalan Hijriyah berdasarkan hasil Ru'yatul Hilal resmi Kementerian Agama RI atau penetapan DKM.",
+                        color = Color(0xFFCBD5E1),
+                        fontSize = 12.sp
+                    )
+
+                    // Preview Card
+                    Card(
+                        shape = RoundedCornerShape(8.dp),
+                        colors = CardDefaults.cardColors(containerColor = Color(0xFF071911)),
+                        border = CardDefaults.outlinedCardBorder().copy(brush = Brush.horizontalGradient(listOf(GoldAccent, Color(0xFF10B981))))
+                    ) {
+                        Column(modifier = Modifier.padding(12.dp)) {
+                            Text(text = "Pratinjau Tanggal Hijriyah:", color = Color(0xFF94A3B8), fontSize = 11.sp)
+                            Text(text = previewHijri, color = GoldAccent, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                text = "Koreksi: " + if (selectedOffset == 0) "Standar (0 Hari)" else "${if (selectedOffset > 0) "+$selectedOffset" else "$selectedOffset"} Hari",
+                                color = Color(0xFF38BDF8),
+                                fontSize = 12.sp
+                            )
+                        }
+                    }
+
+                    Text(text = "Pilih Koreksi Hari:", color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        listOf(-2, -1, 0, 1, 2).forEach { off ->
+                            val label = when (off) {
+                                -2 -> "-2 hr"
+                                -1 -> "-1 hr"
+                                0 -> "0 (Std)"
+                                1 -> "+1 hr"
+                                else -> "+2 hr"
+                            }
+                            FilterChip(
+                                selected = selectedOffset == off,
+                                onClick = { selectedOffset = off },
+                                label = { Text(label, fontSize = 10.sp) },
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        viewModel.updateHijriOffset(selectedOffset)
+                        showEditHijriDialog = false
+                        Toast.makeText(context, "Kalender Hijriyah diperbarui: $previewHijri", Toast.LENGTH_SHORT).show()
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0F5A47))
+                ) {
+                    Text("Terapkan")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showEditHijriDialog = false }) {
                     Text("Batal", color = Color(0xFF94A3B8))
                 }
             }

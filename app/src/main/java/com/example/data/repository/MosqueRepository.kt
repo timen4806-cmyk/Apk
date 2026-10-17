@@ -32,6 +32,10 @@ class MosqueRepository(context: Context) {
     private val _iqomahDurations = MutableStateFlow<Map<String, Int>>(loadIqomahDurations())
     val iqomahDurations: StateFlow<Map<String, Int>> = _iqomahDurations.asStateFlow()
 
+    // Hijri Adjustment Offset (in days, e.g. -2, -1, 0, +1, +2)
+    private val _hijriOffset = MutableStateFlow(prefs.getInt("hijri_day_offset", 0))
+    val hijriOffset: StateFlow<Int> = _hijriOffset.asStateFlow()
+
     // Announcements / Running Text
     private val _announcements = MutableStateFlow<List<Announcement>>(getInitialAnnouncements())
     val announcements: StateFlow<List<Announcement>> = _announcements.asStateFlow()
@@ -92,6 +96,13 @@ class MosqueRepository(context: Context) {
         current[prayerName] = minutes.coerceAtLeast(1)
         _iqomahDurations.value = current
         saveIqomahDurations(current)
+        triggerCloudSync()
+    }
+
+    // Hijri Offset Adjustment Management (e.g. -2..+2)
+    fun updateHijriOffset(offset: Int) {
+        _hijriOffset.value = offset
+        prefs.edit().putInt("hijri_day_offset", offset).apply()
         triggerCloudSync()
     }
 

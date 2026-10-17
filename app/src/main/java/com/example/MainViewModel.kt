@@ -125,6 +125,17 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         repository.updateIqomahDuration(prayerName, minutes)
     }
 
+    val hijriOffset: StateFlow<Int> = repository.hijriOffset
+
+    fun updateHijriOffset(offset: Int) {
+        repository.updateHijriOffset(offset)
+        val now = Calendar.getInstance()
+        val schedule = PrayerTimeCalculator.calculateTimes(now, hijriOffset = offset)
+        _prayerSchedule.value = schedule
+        _currentDateMasehi.value = schedule.dateMasehi
+        _currentDateHijri.value = schedule.dateHijri
+    }
+
     init {
         NotificationHelper.createNotificationChannels(application)
         startClockTicker()
@@ -139,7 +150,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 _currentTime.value = timeString
 
                 // Update schedule if needed
-                val schedule = PrayerTimeCalculator.calculateTimes(now)
+                val schedule = PrayerTimeCalculator.calculateTimes(now, hijriOffset = repository.hijriOffset.value)
                 _prayerSchedule.value = schedule
                 _currentDateMasehi.value = schedule.dateMasehi
                 _currentDateHijri.value = schedule.dateHijri

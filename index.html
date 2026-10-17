@@ -89,8 +89,20 @@
           </div>
         </div>
 
+        <!-- Iqomah Countdown Banner (Active during Iqomah) -->
+        <div id="iqomahBanner" class="mt-4 bg-gradient-to-r from-red-950 via-rose-900 to-amber-950 border-2 border-red-500 rounded-xl p-3.5 flex items-center justify-between shadow-2xl animate-pulse hidden">
+          <div class="flex items-center space-x-3">
+            <span class="text-2xl animate-bounce">⏱️</span>
+            <div>
+              <div class="text-xs text-rose-300 font-bold uppercase tracking-wider">HITUNG MUNDUR IQOMAH (<span id="iqomahPrayerTitle">MAGHRIB</span>)</div>
+              <div class="text-[11px] text-white">Luruskan & rapatkan shaf shalat berjamaah. Matikan nada dering HP.</div>
+            </div>
+          </div>
+          <span id="iqomahCountdownDisplay" class="font-mono font-black text-amber-300 text-2xl tracking-widest bg-black/40 px-3 py-1 rounded-lg border border-amber-400/50">10:00</span>
+        </div>
+
         <!-- Next Prayer Banner -->
-        <div id="countdownBanner" class="mt-6 bg-[#0f3a2c] border border-emerald-700/50 rounded-xl p-3 flex items-center justify-between">
+        <div id="countdownBanner" class="mt-4 bg-[#0f3a2c] border border-emerald-700/50 rounded-xl p-3 flex items-center justify-between">
           <div class="flex items-center space-x-2">
             <span class="text-amber-400 text-lg">⏳</span>
             <span class="text-sm font-semibold text-slate-200">Menuju Shalat <strong id="nextPrayerName" class="text-amber-400">Maghrib</strong> :</span>
@@ -130,22 +142,22 @@
       </div>
     </section>
 
-    <!-- HORIZONTAL PRAYER TIMES CARDS -->
+    <!-- PRAYER TIMES 8-GRID -->
     <section>
       <div class="flex items-center justify-between mb-3">
-        <h2 class="text-base font-bold text-white">Jadwal Shalat Hari Ini (Kemenag RI)</h2>
-        <span class="text-xs text-amber-400 font-medium">Waktu Indonesia Barat (WIB)</span>
+        <h2 class="text-sm font-bold text-amber-400 tracking-wide uppercase">Jadwal Shalat Hari Ini</h2>
+        <span class="text-xs text-slate-400">Metode: Hisab Ephemeris Kemenag</span>
       </div>
-      <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2.5" id="prayerGrid">
-        <!-- Rendered by JS -->
+      <div id="prayerGrid" class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2.5">
+        <!-- Injected via JavaScript -->
       </div>
     </section>
 
     <!-- NAVIGATION TABS -->
-    <section class="bg-[#0e241b] rounded-2xl border border-emerald-800/40 overflow-hidden shadow-xl">
-      <div class="flex border-b border-emerald-900/60 overflow-x-auto text-sm font-medium">
+    <section class="bg-[#0e241b] rounded-2xl border border-emerald-900/60 overflow-hidden shadow-lg">
+      <div class="flex border-b border-emerald-900/60 overflow-x-auto text-xs font-semibold">
         <button onclick="switchTab('petugas')" id="tabBtn_petugas" class="px-5 py-3 border-b-2 border-amber-400 text-amber-400 font-bold whitespace-nowrap">
-          👥 Jadwal Petugas
+          👥 Petugas 5 Waktu
         </button>
         <button onclick="switchTab('jumat')" id="tabBtn_jumat" class="px-5 py-3 border-b-2 border-transparent text-slate-400 hover:text-white whitespace-nowrap">
           🕌 Shalat Jum'at & Hari Raya
@@ -167,26 +179,13 @@
       <!-- TAB CONTENT: SHALAT JUMAT & HARI RAYA -->
       <div id="tabContent_jumat" class="p-4 sm:p-6 space-y-6 hidden">
         <!-- Jumat Card -->
-        <div class="bg-[#071911] border border-amber-500/40 rounded-xl p-5">
-          <div class="flex items-center justify-between mb-3">
-            <span class="bg-amber-400 text-slate-900 text-xs font-black px-2.5 py-1 rounded">JUM'AT BERKAH</span>
-            <span class="text-emerald-400 text-xs font-bold">11:45 WIB</span>
-          </div>
-          <div class="text-xs text-slate-400">Judul Khutbah:</div>
-          <h4 class="text-amber-400 font-bold text-base mb-4">“Meneguhkan Ukhuwah Islamiyah dan Kesalehan Sosial di Era Digital”</h4>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-            <div class="bg-[#0e241b] p-3 rounded-lg"><span class="text-slate-400 block font-semibold">KHATIB:</span><span class="text-white font-bold text-sm">K.H. Tb. Abdul Qodir, M.Pd.I</span></div>
-            <div class="bg-[#0e241b] p-3 rounded-lg"><span class="text-slate-400 block font-semibold">IMAM SHALAT:</span><span class="text-white font-bold text-sm">Ust. Dr. H. Ahmad Fauzi, Lc., M.A.</span></div>
-            <div class="bg-[#0e241b] p-3 rounded-lg"><span class="text-slate-400 block font-semibold">MUADZIN:</span><span class="text-white font-bold text-sm">Ust. M. Syukron</span></div>
-            <div class="bg-[#0e241b] p-3 rounded-lg"><span class="text-slate-400 block font-semibold">BILAL JUM'AT:</span><span class="text-white font-bold text-sm">Ust. Ahmad Rifai</span></div>
-          </div>
+        <div class="bg-[#071911] border border-amber-500/40 rounded-xl p-5" id="fridayDisplayCard">
+          <!-- Injected via JS -->
         </div>
 
         <!-- Hari Raya Card -->
-        <div class="bg-[#071911] border border-emerald-800/50 rounded-xl p-5">
-          <span class="bg-[#0f5a47] text-white text-xs font-bold px-2.5 py-1 rounded">SHALAT IDUL FITRI & IDUL ADHA 1448 H</span>
-          <p class="text-xs text-slate-300 mt-2 mb-3">Pelaksanaan Shalat Ied dipusatkan di Gedung Utama & Pelataran Masjid Jami' At-Taqwa Penancangan.</p>
-          <div class="text-xs text-slate-400">Khatib Idul Fitri: <strong class="text-amber-400">Prof. Dr. K.H. Tb. Mansyur, M.A.</strong> • Imam: <strong class="text-white">K.H. Tb. Abdul Qodir</strong></div>
+        <div class="bg-[#071911] border border-emerald-800/50 rounded-xl p-5" id="eidDisplayCard">
+          <!-- Injected via JS -->
         </div>
       </div>
 
@@ -243,7 +242,7 @@
           </div>
           <h3 class="text-lg font-bold text-white mb-1">Akses Pengurus DKM Terproteksi</h3>
           <p class="text-xs text-slate-400 mb-6 leading-relaxed">
-            Aplikasi ini dapat diakses publik oleh seluruh jemaah melalui link web. Untuk mengubah jadwal shalat, running text, atau laporan kas, silakan masukkan PIN Keamanan DKM.
+            Aplikasi ini dapat diakses publik oleh seluruh jemaah melalui link web. Untuk mengubah jadwal shalat, petugas, iqomah, running text, atau laporan kas, silakan masukkan PIN Keamanan DKM.
           </p>
           <div class="space-y-3">
             <input type="password" id="adminPinInput" placeholder="Masukkan PIN Keamanan" maxlength="6" class="w-full bg-[#071911] border border-emerald-700/60 rounded-xl px-4 py-3 text-center text-xl tracking-widest text-white focus:outline-none focus:border-amber-400 font-mono">
@@ -267,27 +266,153 @@
             </button>
           </div>
 
-          <!-- Edit Petugas -->
+          <!-- Section 1: Edit Petugas 5 Waktu -->
           <div class="space-y-3">
-            <h5 class="text-amber-400 font-bold text-xs uppercase tracking-wide">Edit Petugas Shalat 5 Waktu</h5>
+            <h5 class="text-amber-400 font-bold text-xs uppercase tracking-wide">1. Edit Petugas Shalat 5 Waktu (Harian)</h5>
             <div id="adminOfficersEdit" class="space-y-2"></div>
             <button onclick="saveAdminData()" class="bg-[#0f5a47] hover:bg-emerald-600 text-white text-xs font-bold px-4 py-2 rounded-lg">
-              Simpan Perubahan Petugas
+              Simpan Perubahan Petugas 5 Waktu
             </button>
           </div>
 
-          <!-- Edit Running Text Marquee -->
+          <!-- Section 2: Edit Petugas Shalat Jum'at -->
           <div class="space-y-3 pt-4 border-t border-emerald-900/60">
-            <h5 class="text-amber-400 font-bold text-xs uppercase tracking-wide">Edit Pesan Siaran / Running Text Pengumuman</h5>
+            <h5 class="text-amber-400 font-bold text-xs uppercase tracking-wide">2. Edit Petugas Shalat Jum'at (Khatib, Imam, Muadzin, Bilal)</h5>
+            <div class="bg-[#071911] p-4 rounded-xl border border-emerald-900 space-y-3 text-xs">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label class="text-slate-400 block mb-1">Khatib Jum'at:</label>
+                  <input type="text" id="edit_jumat_khatib" class="w-full bg-[#0e241b] border border-emerald-800 rounded p-2 text-white">
+                </div>
+                <div>
+                  <label class="text-slate-400 block mb-1">Imam Shalat Jum'at:</label>
+                  <input type="text" id="edit_jumat_imam" class="w-full bg-[#0e241b] border border-emerald-800 rounded p-2 text-white">
+                </div>
+                <div>
+                  <label class="text-slate-400 block mb-1">Muadzin Jum'at:</label>
+                  <input type="text" id="edit_jumat_muadzin" class="w-full bg-[#0e241b] border border-emerald-800 rounded p-2 text-white">
+                </div>
+                <div>
+                  <label class="text-slate-400 block mb-1">Bilal Jum'at:</label>
+                  <input type="text" id="edit_jumat_bilal" class="w-full bg-[#0e241b] border border-emerald-800 rounded p-2 text-white">
+                </div>
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div class="sm:col-span-2">
+                  <label class="text-slate-400 block mb-1">Judul / Tema Khutbah:</label>
+                  <input type="text" id="edit_jumat_theme" class="w-full bg-[#0e241b] border border-emerald-800 rounded p-2 text-white">
+                </div>
+                <div>
+                  <label class="text-slate-400 block mb-1">Waktu Pelaksanaan:</label>
+                  <input type="text" id="edit_jumat_time" class="w-full bg-[#0e241b] border border-emerald-800 rounded p-2 text-white" placeholder="Contoh: 11:45 WIB">
+                </div>
+              </div>
+              <button onclick="saveFridayData()" class="bg-[#0f5a47] hover:bg-emerald-600 text-white text-xs font-bold px-4 py-2 rounded-lg">
+                Simpan Jadwal Shalat Jum'at
+              </button>
+            </div>
+          </div>
+
+          <!-- Section 3: Edit Petugas Shalat Hari Raya -->
+          <div class="space-y-3 pt-4 border-t border-emerald-900/60">
+            <h5 class="text-amber-400 font-bold text-xs uppercase tracking-wide">3. Edit Petugas Shalat Hari Raya (Idul Fitri & Idul Adha)</h5>
+            <div id="adminEidEditor" class="space-y-3">
+              <!-- Injected via JS -->
+            </div>
+            <button onclick="saveEidData()" class="bg-[#0f5a47] hover:bg-emerald-600 text-white text-xs font-bold px-4 py-2 rounded-lg">
+              Simpan Jadwal Hari Raya
+            </button>
+          </div>
+
+          <!-- Section 4: Fitur Iqomah & Hitung Mundur Manual -->
+          <div class="space-y-3 pt-4 border-t border-emerald-900/60">
+            <h5 class="text-amber-400 font-bold text-xs uppercase tracking-wide">4. Fitur Iqomah & Hitung Mundur Manual</h5>
+            <div class="bg-[#071911] p-4 rounded-xl border border-rose-900/50 space-y-4">
+              <!-- Manual Trigger -->
+              <div class="space-y-2">
+                <span class="text-xs font-bold text-rose-300 block">Hitung Mundur Iqomah Langsung / Manual:</span>
+                <div class="grid grid-cols-1 sm:grid-cols-4 gap-2 text-xs">
+                  <div>
+                    <label class="text-slate-400 block mb-1">Shalat:</label>
+                    <select id="manualIqomahPrayer" class="w-full bg-[#0e241b] border border-emerald-800 rounded p-2 text-white">
+                      <option value="Subuh">Subuh</option>
+                      <option value="Dzuhur">Dzuhur</option>
+                      <option value="Ashar">Ashar</option>
+                      <option value="Maghrib" selected>Maghrib</option>
+                      <option value="Isya">Isya</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="text-slate-400 block mb-1">Menit:</label>
+                    <input type="number" id="manualIqomahMin" value="10" min="1" max="59" class="w-full bg-[#0e241b] border border-emerald-800 rounded p-2 text-white">
+                  </div>
+                  <div>
+                    <label class="text-slate-400 block mb-1">Detik:</label>
+                    <input type="number" id="manualIqomahSec" value="0" min="0" max="59" class="w-full bg-[#0e241b] border border-emerald-800 rounded p-2 text-white">
+                  </div>
+                  <div class="flex items-end space-x-2">
+                    <button onclick="startManualIqomah()" class="bg-rose-700 hover:bg-rose-600 text-white text-xs font-bold px-3 py-2 rounded-lg flex-1">
+                      Mulai
+                    </button>
+                    <button onclick="stopIqomah()" class="bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-bold px-3 py-2 rounded-lg">
+                      Stop
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Durations per prayer -->
+              <div class="space-y-2 pt-3 border-t border-emerald-950">
+                <span class="text-xs font-bold text-slate-300 block">Edit Durasi Otomatis Hitung Mundur (Menit):</span>
+                <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 text-xs" id="iqomahDurationsEdit">
+                  <!-- Injected via JS -->
+                </div>
+                <button onclick="saveIqomahDurations()" class="bg-[#0f5a47] hover:bg-emerald-600 text-white text-xs font-bold px-4 py-2 rounded-lg">
+                  Simpan Durasi Iqomah Otomatis
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 5: Kalender Hijriah & Penyesuaian Ru'yatul Hilal -->
+          <div class="space-y-3 pt-4 border-t border-emerald-900/60">
+            <h5 class="text-amber-400 font-bold text-xs uppercase tracking-wide">5. Kalender Hijriyah & Koreksi Tanggal</h5>
+            <div class="bg-[#071911] p-4 rounded-xl border border-sky-900/50 space-y-3 text-xs">
+              <div class="flex items-center justify-between">
+                <div>
+                  <span class="text-slate-400 block">Tanggal Hijriah Hari Ini (Terkalkulasi):</span>
+                  <span id="previewHijriDateText" class="text-amber-400 font-bold text-base">5 Jumadil Awal 1448 H</span>
+                </div>
+                <div class="text-right">
+                  <span class="text-slate-400 block">Koreksi Aktif:</span>
+                  <span id="currentHijriOffsetLabel" class="text-sky-400 font-semibold text-xs">Standar (0 Hari)</span>
+                </div>
+              </div>
+              <p class="text-slate-400 text-[11px]">
+                Koreksi penanggalan Hijriah untuk menyelaraskan dengan hasil Ru'yatul Hilal Kemenag RI atau penetapan DKM:
+              </p>
+              <div class="flex items-center space-x-2">
+                <button onclick="setHijriOffset(-2)" class="bg-[#0e241b] border border-emerald-800 text-slate-200 px-3 py-1.5 rounded hover:border-amber-400 text-xs">-2 Hari</button>
+                <button onclick="setHijriOffset(-1)" class="bg-[#0e241b] border border-emerald-800 text-slate-200 px-3 py-1.5 rounded hover:border-amber-400 text-xs">-1 Hari</button>
+                <button onclick="setHijriOffset(0)" class="bg-[#0f5a47] border border-amber-400 text-amber-300 font-bold px-3 py-1.5 rounded text-xs">0 (Standar Kemenag)</button>
+                <button onclick="setHijriOffset(1)" class="bg-[#0e241b] border border-emerald-800 text-slate-200 px-3 py-1.5 rounded hover:border-amber-400 text-xs">+1 Hari</button>
+                <button onclick="setHijriOffset(2)" class="bg-[#0e241b] border border-emerald-800 text-slate-200 px-3 py-1.5 rounded hover:border-amber-400 text-xs">+2 Hari</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 6: Edit Running Text Marquee -->
+          <div class="space-y-3 pt-4 border-t border-emerald-900/60">
+            <h5 class="text-amber-400 font-bold text-xs uppercase tracking-wide">6. Edit Pesan Siaran / Running Text Pengumuman</h5>
             <textarea id="adminMarqueeInput" rows="2" class="w-full bg-[#071911] border border-emerald-800 rounded-lg p-2.5 text-xs text-white" placeholder="Ketik pengumuman berjalan..."></textarea>
             <button onclick="saveMarqueeData()" class="bg-[#0f5a47] hover:bg-emerald-600 text-white text-xs font-bold px-4 py-2 rounded-lg">
               Simpan Running Text
             </button>
           </div>
 
-          <!-- Edit Saldo Kas -->
+          <!-- Section 7: Edit Saldo Kas -->
           <div class="space-y-3 pt-4 border-t border-emerald-900/60">
-            <h5 class="text-amber-400 font-bold text-xs uppercase tracking-wide">Edit Saldo Kas Masjid Terkini</h5>
+            <h5 class="text-amber-400 font-bold text-xs uppercase tracking-wide">7. Edit Saldo Kas Masjid Terkini</h5>
             <div class="flex items-center space-x-2">
               <input type="text" id="adminKasInput" class="w-full bg-[#071911] border border-emerald-800 rounded-lg p-2.5 text-xs text-white" placeholder="Contoh: Rp 48.750.000,-">
               <button onclick="saveKasData()" class="bg-[#0f5a47] hover:bg-emerald-600 text-white text-xs font-bold px-4 py-2.5 rounded-lg whitespace-nowrap">
@@ -330,6 +455,72 @@
     const LAT = -6.1104;
     const LNG = 106.1640;
     const TZ = 7;
+
+    // Hijri Adjustment Offset (in days, e.g. -2..+2)
+    let hijriDayOffset = 0;
+    try {
+      const savedOffset = localStorage.getItem('attaqwa_hijri_offset');
+      if (savedOffset !== null) hijriDayOffset = parseInt(savedOffset, 10) || 0;
+    } catch(e) {}
+
+    // Accurate Civil Islamic Calendar calculation
+    function getHijriString(dateObj = new Date()) {
+      let y = dateObj.getFullYear();
+      let m = dateObj.getMonth() + 1;
+      const d = dateObj.getDate();
+
+      if (m < 3) {
+        y -= 1;
+        m += 12;
+      }
+      const a = Math.floor(y / 100);
+      const b = 2 - a + Math.floor(a / 4);
+      const jd = Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (m + 1)) + d + b - 1524;
+
+      // Civil Islamic Calendar epoch: July 16, 622 CE -> JD 1948440
+      const days = (jd - 1948440) + hijriDayOffset;
+      const cycle = Math.floor(days / 10631);
+      const remDays = days % 10631;
+
+      const leapYears = new Set([2, 5, 7, 10, 13, 16, 18, 21, 24, 26, 29]);
+      let yearInCycle = 0;
+      let daysAcc = 0;
+      while (yearInCycle < 30) {
+        const yearLen = leapYears.has(yearInCycle + 1) ? 355 : 354;
+        if (remDays < daysAcc + yearLen) break;
+        daysAcc += yearLen;
+        yearInCycle++;
+      }
+
+      const hijriYear = cycle * 30 + yearInCycle + 1;
+      const dayInYear = remDays - daysAcc;
+
+      const monthDays = [30, 29, 30, 29, 30, 29, 30, 29, 30, 29, 30, 29];
+      if (leapYears.has(yearInCycle + 1)) {
+        monthDays[11] = 30;
+      }
+
+      let hijriMonth = 1;
+      let hijriDay = 1;
+      let daysInMAcc = 0;
+      for (let mIdx = 0; mIdx < monthDays.length; mIdx++) {
+        const mLen = monthDays[mIdx];
+        if (dayInYear < daysInMAcc + mLen) {
+          hijriMonth = mIdx + 1;
+          hijriDay = dayInYear - daysInMAcc + 1;
+          break;
+        }
+        daysInMAcc += mLen;
+      }
+
+      const hijriMonths = [
+        "Muharram", "Safar", "Rabi'ul Awwal", "Rabi'ul Akhir",
+        "Jumadil Awal", "Jumadil Akhir", "Rajab", "Sya'ban",
+        "Ramadhan", "Syawal", "Dzulqa'dah", "Dzulhijjah"
+      ];
+
+      return `${hijriDay} ${hijriMonths[hijriMonth - 1]} ${hijriYear} H`;
+    }
 
     // Islamic Prayer Calculation (Kemenag standard)
     function calculatePrayerTimes() {
@@ -389,14 +580,7 @@
       ];
     }
 
-    // Hijri date approximation
-    function getHijriString() {
-      const now = new Date();
-      const hijriMonths = ["Muharram", "Safar", "Rabi'ul Awwal", "Rabi'ul Akhir", "Jumadil Ula", "Jumadil Akhir", "Rajab", "Sya'ban", "Ramadhan", "Syawal", "Dzulqa'dah", "Dzulhijjah"];
-      // Approximate 1448 H
-      return `16 Jumadil Ula 1448 H`;
-    }
-
+    // Default In-Memory / Stored Data
     let defaultOfficers = [
       { prayer: "Subuh", imam: "K.H. Tb. Abdul Qodir", muadzin: "Ust. M. Syukron", bilal: "Ust. Ahmad Rifai" },
       { prayer: "Dzuhur", imam: "Ust. Drs. H. Marzuki", muadzin: "Kang Fajar Siddiq", bilal: "Kang Wildan Firdaus" },
@@ -404,6 +588,50 @@
       { prayer: "Maghrib", imam: "K.H. Tb. Abdul Qodir", muadzin: "Ust. Ahmad Rifai", bilal: "Ust. M. Syukron" },
       { prayer: "Isya", imam: "Ust. Dr. H. Ahmad Fauzi, M.A.", muadzin: "Ust. Ahmad Rifai", bilal: "Ust. M. Syukron" }
     ];
+
+    let fridaySchedule = {
+      khatib: "K.H. Tb. Abdul Qodir, M.Pd.I",
+      imam: "Ust. Dr. H. Ahmad Fauzi, Lc., M.A.",
+      muadzin: "Ust. M. Syukron",
+      bilal: "Ust. Ahmad Rifai",
+      theme: "Meneguhkan Ukhuwah Islamiyah dan Kesalehan Sosial di Era Digital",
+      time: "11:45 WIB"
+    };
+
+    let eidSchedules = [
+      {
+        id: "eid1",
+        eidType: "Shalat Idul Fitri 1448 H",
+        khatib: "Prof. Dr. K.H. Tb. Mansyur, M.A.",
+        imam: "K.H. Tb. Abdul Qodir",
+        bilal: "Ust. Ahmad Rifai",
+        time: "06:45 WIB",
+        location: "Gedung Utama & Pelataran Masjid"
+      },
+      {
+        id: "eid2",
+        eidType: "Shalat Idul Adha 1448 H",
+        khatib: "Ust. Dr. H. Ahmad Fauzi, Lc., M.A.",
+        imam: "Ust. Drs. H. Marzuki",
+        bilal: "Kang Fajar Siddiq",
+        time: "06:30 WIB",
+        location: "Gedung Utama & Lapangan Masjid"
+      }
+    ];
+
+    let iqomahDurations = {
+      Subuh: 12,
+      Dzuhur: 10,
+      Ashar: 10,
+      Maghrib: 8,
+      Isya: 10
+    };
+
+    // Iqomah Countdown State
+    let iqomahActive = false;
+    let iqomahRemainingSeconds = 0;
+    let iqomahTimerInterval = null;
+    let activeIqomahPrayer = "Maghrib";
 
     function renderPrayers(prayers, nextName) {
       const grid = document.getElementById('prayerGrid');
@@ -434,7 +662,53 @@
       `).join('');
     }
 
+    function renderFridayAndEid() {
+      // Friday
+      const fContainer = document.getElementById('fridayDisplayCard');
+      if (fContainer) {
+        fContainer.innerHTML = `
+          <div class="flex items-center justify-between mb-3">
+            <span class="bg-amber-400 text-slate-900 text-xs font-black px-2.5 py-1 rounded">JUM'AT BERKAH</span>
+            <span class="text-emerald-400 text-xs font-bold">${fridaySchedule.time}</span>
+          </div>
+          <div class="text-xs text-slate-400">Judul Khutbah:</div>
+          <h4 class="text-amber-400 font-bold text-base mb-4">“${fridaySchedule.theme}”</h4>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+            <div class="bg-[#0e241b] p-3 rounded-lg"><span class="text-slate-400 block font-semibold">KHATIB:</span><span class="text-white font-bold text-sm">${fridaySchedule.khatib}</span></div>
+            <div class="bg-[#0e241b] p-3 rounded-lg"><span class="text-slate-400 block font-semibold">IMAM SHALAT:</span><span class="text-white font-bold text-sm">${fridaySchedule.imam}</span></div>
+            <div class="bg-[#0e241b] p-3 rounded-lg"><span class="text-slate-400 block font-semibold">MUADZIN:</span><span class="text-white font-bold text-sm">${fridaySchedule.muadzin}</span></div>
+            <div class="bg-[#0e241b] p-3 rounded-lg"><span class="text-slate-400 block font-semibold">BILAL JUM'AT:</span><span class="text-white font-bold text-sm">${fridaySchedule.bilal}</span></div>
+          </div>
+        `;
+      }
+
+      // Eid
+      const eContainer = document.getElementById('eidDisplayCard');
+      if (eContainer) {
+        eContainer.innerHTML = `
+          <span class="bg-[#0f5a47] text-white text-xs font-bold px-2.5 py-1 rounded">SHALAT IDUL FITRI & IDUL ADHA 1448 H</span>
+          <p class="text-xs text-slate-300 mt-2 mb-4">Jadwal pelaksanaan Shalat Ied Berjamaah Masjid Jami' At-Taqwa Penancangan:</p>
+          <div class="space-y-3">
+            ${eidSchedules.map(e => `
+              <div class="bg-[#0e241b] p-3.5 rounded-lg border border-emerald-900">
+                <div class="flex items-center justify-between mb-1.5">
+                  <span class="text-amber-400 font-bold text-sm">${e.eidType}</span>
+                  <span class="text-emerald-400 text-xs font-bold">${e.time}</span>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
+                  <div><span class="text-slate-400 block">Khatib:</span><span class="text-white font-semibold">${e.khatib}</span></div>
+                  <div><span class="text-slate-400 block">Imam:</span><span class="text-white font-semibold">${e.imam}</span></div>
+                  <div><span class="text-slate-400 block">Bilal:</span><span class="text-white font-semibold">${e.bilal}</span></div>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      }
+    }
+
     function renderAdminEditor() {
+      // Officers 5 Waktu
       const container = document.getElementById('adminOfficersEdit');
       container.innerHTML = defaultOfficers.map((o, idx) => `
         <div class="bg-[#071911] p-3 rounded-lg border border-emerald-900 grid grid-cols-1 sm:grid-cols-4 gap-2 text-xs">
@@ -444,6 +718,56 @@
           <input type="text" id="edit_bilal_${idx}" value="${o.bilal}" class="bg-[#0e241b] border border-emerald-800 rounded p-1.5 text-white" placeholder="Bilal">
         </div>
       `).join('');
+
+      // Friday Editor
+      document.getElementById('edit_jumat_khatib').value = fridaySchedule.khatib;
+      document.getElementById('edit_jumat_imam').value = fridaySchedule.imam;
+      document.getElementById('edit_jumat_muadzin').value = fridaySchedule.muadzin;
+      document.getElementById('edit_jumat_bilal').value = fridaySchedule.bilal;
+      document.getElementById('edit_jumat_theme').value = fridaySchedule.theme;
+      document.getElementById('edit_jumat_time').value = fridaySchedule.time;
+
+      // Eid Editor
+      const eidContainer = document.getElementById('adminEidEditor');
+      eidContainer.innerHTML = eidSchedules.map((e, idx) => `
+        <div class="bg-[#0e241b] p-3 rounded-lg border border-emerald-900 space-y-2 text-xs">
+          <div class="font-bold text-amber-400">${e.eidType}</div>
+          <div class="grid grid-cols-1 sm:grid-cols-4 gap-2">
+            <div>
+              <label class="text-slate-400 block mb-1">Khatib:</label>
+              <input type="text" id="edit_eid_khatib_${idx}" value="${e.khatib}" class="w-full bg-[#071911] border border-emerald-800 rounded p-1.5 text-white">
+            </div>
+            <div>
+              <label class="text-slate-400 block mb-1">Imam:</label>
+              <input type="text" id="edit_eid_imam_${idx}" value="${e.imam}" class="w-full bg-[#071911] border border-emerald-800 rounded p-1.5 text-white">
+            </div>
+            <div>
+              <label class="text-slate-400 block mb-1">Bilal:</label>
+              <input type="text" id="edit_eid_bilal_${idx}" value="${e.bilal}" class="w-full bg-[#071911] border border-emerald-800 rounded p-1.5 text-white">
+            </div>
+            <div>
+              <label class="text-slate-400 block mb-1">Jam Pelaksanaan:</label>
+              <input type="text" id="edit_eid_time_${idx}" value="${e.time}" class="w-full bg-[#071911] border border-emerald-800 rounded p-1.5 text-white">
+            </div>
+          </div>
+        </div>
+      `).join('');
+
+      // Iqomah durations
+      const iqContainer = document.getElementById('iqomahDurationsEdit');
+      iqContainer.innerHTML = ['Subuh', 'Dzuhur', 'Ashar', 'Maghrib', 'Isya'].map(p => `
+        <div class="bg-[#0e241b] p-2.5 rounded-lg border border-emerald-900 text-center">
+          <span class="text-amber-400 font-bold block mb-1">${p}</span>
+          <div class="flex items-center justify-center space-x-1">
+            <input type="number" id="iq_dur_${p}" value="${iqomahDurations[p] || 10}" min="1" max="59" class="w-14 bg-[#071911] border border-emerald-800 rounded p-1 text-center text-white font-bold">
+            <span class="text-slate-400 text-[10px]">m</span>
+          </div>
+        </div>
+      `).join('');
+
+      // Hijri preview
+      document.getElementById('previewHijriDateText').textContent = getHijriString();
+      document.getElementById('currentHijriOffsetLabel').textContent = hijriDayOffset === 0 ? "Standar (0 Hari)" : (hijriDayOffset > 0 ? `+${hijriDayOffset} Hari` : `${hijriDayOffset} Hari`);
     }
 
     function updateClock() {
@@ -455,7 +779,7 @@
       const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
       const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
       document.getElementById('dateMasehi').textContent = `${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
-      document.getElementById('dateHijri').textContent = getHijriString();
+      document.getElementById('dateHijri').textContent = getHijriString(now);
 
       // Next prayer computation
       const prayers = calculatePrayerTimes();
@@ -481,7 +805,7 @@
       document.getElementById('officerMuadzin').textContent = activeO.muadzin;
       document.getElementById('officerBilal').textContent = activeO.bilal;
 
-      // Countdown
+      // Countdown to next prayer
       const [nh, nm] = nextP.time.split(':').map(Number);
       let targetSec = (nh * 60 + nm) * 60;
       let nowSec = (now.getHours() * 60 + now.getMinutes()) * 60 + now.getSeconds();
@@ -531,6 +855,7 @@
       document.getElementById('adminPinInput').value = "";
     }
 
+    // Save Handlers
     function saveAdminData() {
       defaultOfficers.forEach((o, idx) => {
         const iEl = document.getElementById(`edit_imam_${idx}`);
@@ -543,7 +868,108 @@
       localStorage.setItem('attaqwa_officers', JSON.stringify(defaultOfficers));
       renderOfficers();
       syncToCloud();
-      alert("Jadwal petugas shalat berhasil disimpan!");
+      alert("Jadwal petugas shalat 5 waktu berhasil disimpan!");
+    }
+
+    function saveFridayData() {
+      fridaySchedule.khatib = document.getElementById('edit_jumat_khatib').value;
+      fridaySchedule.imam = document.getElementById('edit_jumat_imam').value;
+      fridaySchedule.muadzin = document.getElementById('edit_jumat_muadzin').value;
+      fridaySchedule.bilal = document.getElementById('edit_jumat_bilal').value;
+      fridaySchedule.theme = document.getElementById('edit_jumat_theme').value;
+      fridaySchedule.time = document.getElementById('edit_jumat_time').value;
+
+      localStorage.setItem('attaqwa_friday', JSON.stringify(fridaySchedule));
+      renderFridayAndEid();
+      syncToCloud();
+      alert("Jadwal Shalat Jum'at (Khatib, Imam, Muadzin, Bilal) berhasil disimpan!");
+    }
+
+    function saveEidData() {
+      eidSchedules.forEach((e, idx) => {
+        const k = document.getElementById(`edit_eid_khatib_${idx}`);
+        const i = document.getElementById(`edit_eid_imam_${idx}`);
+        const b = document.getElementById(`edit_eid_bilal_${idx}`);
+        const t = document.getElementById(`edit_eid_time_${idx}`);
+        if (k) e.khatib = k.value;
+        if (i) e.imam = i.value;
+        if (b) e.bilal = b.value;
+        if (t) e.time = t.value;
+      });
+
+      localStorage.setItem('attaqwa_eid', JSON.stringify(eidSchedules));
+      renderFridayAndEid();
+      syncToCloud();
+      alert("Jadwal Shalat Hari Raya (Idul Fitri & Idul Adha) berhasil disimpan!");
+    }
+
+    // Iqomah logic
+    function startManualIqomah() {
+      const p = document.getElementById('manualIqomahPrayer').value;
+      const m = parseInt(document.getElementById('manualIqomahMin').value, 10) || 10;
+      const s = parseInt(document.getElementById('manualIqomahSec').value, 10) || 0;
+      activeIqomahPrayer = p;
+      iqomahRemainingSeconds = m * 60 + s;
+      iqomahActive = true;
+
+      document.getElementById('iqomahPrayerTitle').textContent = p.toUpperCase();
+      document.getElementById('iqomahBanner').classList.remove('hidden');
+
+      if (iqomahTimerInterval) clearInterval(iqomahTimerInterval);
+
+      updateIqomahDisplay();
+      playPrayerBeep();
+
+      iqomahTimerInterval = setInterval(() => {
+        iqomahRemainingSeconds--;
+        if (iqomahRemainingSeconds <= 0) {
+          clearInterval(iqomahTimerInterval);
+          document.getElementById('iqomahCountdownDisplay').textContent = "00:00";
+          playPrayerBeep();
+          setTimeout(() => {
+            stopIqomah();
+          }, 6000);
+        } else {
+          updateIqomahDisplay();
+        }
+      }, 1000);
+
+      alert(`Hitung mundur Iqomah ${p} dimulai (${m}m ${s}s)!`);
+    }
+
+    function stopIqomah() {
+      iqomahActive = false;
+      if (iqomahTimerInterval) clearInterval(iqomahTimerInterval);
+      document.getElementById('iqomahBanner').classList.add('hidden');
+    }
+
+    function updateIqomahDisplay() {
+      const m = Math.floor(iqomahRemainingSeconds / 60);
+      const s = iqomahRemainingSeconds % 60;
+      document.getElementById('iqomahCountdownDisplay').textContent = 
+        `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+    }
+
+    function saveIqomahDurations() {
+      ['Subuh', 'Dzuhur', 'Ashar', 'Maghrib', 'Isya'].forEach(p => {
+        const el = document.getElementById(`iq_dur_${p}`);
+        if (el) iqomahDurations[p] = parseInt(el.value, 10) || 10;
+      });
+      localStorage.setItem('attaqwa_iqomah_durations', JSON.stringify(iqomahDurations));
+      syncToCloud();
+      alert("Pengaturan durasi Iqomah otomatis berhasil disimpan!");
+    }
+
+    // Hijri Adjustment
+    function setHijriOffset(offset) {
+      hijriDayOffset = offset;
+      localStorage.setItem('attaqwa_hijri_offset', offset);
+      const dateText = getHijriString();
+      document.getElementById('dateHijri').textContent = dateText;
+      document.getElementById('previewHijriDateText').textContent = dateText;
+      document.getElementById('currentHijriOffsetLabel').textContent = offset === 0 ? "Standar (0 Hari)" : (offset > 0 ? `+${offset} Hari` : `${offset} Hari`);
+      syncToCloud();
+      alert(`Kalender Hijriah disesuaikan! Tanggal saat ini: ${dateText}`);
     }
 
     function saveMarqueeData() {
@@ -573,6 +999,10 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             officers: defaultOfficers,
+            friday: fridaySchedule,
+            eid: eidSchedules,
+            iqomahDurations: iqomahDurations,
+            hijriOffset: hijriDayOffset,
             announcements: [document.getElementById('runningMarquee').textContent.trim()]
           })
         }).catch(() => {});
@@ -614,6 +1044,12 @@
     try {
       const savedO = localStorage.getItem('attaqwa_officers');
       if (savedO) defaultOfficers = JSON.parse(savedO);
+      const savedF = localStorage.getItem('attaqwa_friday');
+      if (savedF) fridaySchedule = JSON.parse(savedF);
+      const savedE = localStorage.getItem('attaqwa_eid');
+      if (savedE) eidSchedules = JSON.parse(savedE);
+      const savedIq = localStorage.getItem('attaqwa_iqomah_durations');
+      if (savedIq) iqomahDurations = JSON.parse(savedIq);
       const savedM = localStorage.getItem('attaqwa_marquee');
       if (savedM) document.getElementById('runningMarquee').textContent = savedM;
       const savedK = localStorage.getItem('attaqwa_kas');
@@ -622,6 +1058,7 @@
 
     // Init
     renderOfficers();
+    renderFridayAndEid();
     updateClock();
     setInterval(updateClock, 1000);
   </script>

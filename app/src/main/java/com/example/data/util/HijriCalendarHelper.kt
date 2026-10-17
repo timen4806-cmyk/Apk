@@ -1,42 +1,80 @@
 package com.example.data.util
 
 import java.util.Calendar
-import kotlin.math.floor
 
 object HijriCalendarHelper {
 
     private val HIJRI_MONTHS = arrayOf(
         "Muharram", "Safar", "Rabi'ul Awwal", "Rabi'ul Akhir",
-        "Jumadil Ula", "Jumadil Akhir", "Rajab", "Sya'ban",
+        "Jumadil Awal", "Jumadil Akhir", "Rajab", "Sya'ban",
         "Ramadhan", "Syawal", "Dzulqa'dah", "Dzulhijjah"
     )
 
-    fun getHijriDateString(calendar: Calendar = Calendar.getInstance()): String {
-        val y = calendar.get(Calendar.YEAR)
-        val m = calendar.get(Calendar.MONTH) + 1
+    // Standard 30-year leap cycle (years 2, 5, 7, 10, 13, 16, 18, 21, 24, 26, 29)
+    private val LEAP_YEARS = setOf(2, 5, 7, 10, 13, 16, 18, 21, 24, 26, 29)
+
+    /**
+     * Converts a Gregorian Calendar date into Hijri date (Day, Month [1..12], Year).
+     * @param calendar Gregorian calendar instance
+     * @param dayOffset optional adjustment offset in days (-2..+2) for local ru'yatul hilal alignment
+     */
+    fun getHijriDate(calendar: Calendar = Calendar.getInstance(), dayOffset: Int = 0): Triple<Int, Int, Int> {
+        var y = calendar.get(Calendar.YEAR)
+        var m = calendar.get(Calendar.MONTH) + 1
         val d = calendar.get(Calendar.DAY_OF_MONTH)
 
-        // Julian Day Number
-        var julian = d - 32075 +
-                1461 * (y + 4800 + (m - 14) / 12) / 4 +
-                367 * (m - 2 - (m - 14) / 12 * 12) / 12 -
-                3 * ((y + 4900 + (m - 14) / 12) / 100) / 4
+        if (m < 3) {
+            y -= 1
+            m += 12
+        }
+        val a = y / 100
+        val b = 2 - a + a / 4
+        val jd = (365.25 * (y + 4716)).toLong() + (30.6001 * (m + 1)).toLong() + d + b - 1524
 
-        // Convert JD to Hijri
-        val l = julian - 1948440 + 10632
-        val n = (l - 1) / 10631
-        val lPrime = l - 10631 * n + 354
-        val j = (floor((10985 - lPrime) / 5316.0) * floor((50 * lPrime + 17719) / 17700.0) +
-                floor(lPrime / 5670.0) * floor((43 * lPrime + 15238) / 15235.0)).toInt()
-        val lDoublePrime = lPrime - (floor((30 - j) / 15.0) * floor((17719 * j) / 50.0) +
-                floor(j / 16.0) * floor((15235 * j) / 43.0)).toInt() + 29
-        val hijriMonth = (24 * lDoublePrime / 709).toInt()
-        val hijriDay = lDoublePrime - 709 * hijriMonth / 24
-        val hijriYear = 30 * n + j - 30
+        // Civil Islamic calendar epoch: July 16, 622 CE -> JD 1948440
+        val days = (jd - 1948440L) + dayOffset
+        val cycle = days / 10631L
+        val remDays = (days % 10631L).toInt()
 
-        val validMonth = (hijriMonth - 1).coerceIn(0, 11)
+        var yearInCycle = 0
+        var daysAcc = 0
+        while (yearInCycle < 30) {
+            val yearLen = if (LEAP_YEARS.contains(yearInCycle + 1)) 355 else 354
+            if (remDays < daysAcc + yearLen) {
+                break
+            }
+            daysAcc += yearLen
+            yearInCycle++
+        }
+
+        val hijriYear = (cycle * 30 + yearInCycle + 1).toInt()
+        val dayInYear = remDays - daysAcc
+
+        val monthDays = intArrayOf(30, 29, 30, 29, 30, 29, 30, 29, 30, 29, 30, 29)
+        if (LEAP_YEARS.contains(yearInCycle + 1)) {
+            monthDays[11] = 30
+        }
+
+        var hijriMonth = 1
+        var hijriDay = 1
+        var daysInMAcc = 0
+        for (mIdx in monthDays.indices) {
+            val mLen = monthDays[mIdx]
+            if (dayInYear < daysInMAcc + mLen) {
+                hijriMonth = mIdx + 1
+                hijriDay = dayInYear - daysInMAcc + 1
+                break
+            }
+            daysInMAcc += mLen
+        }
+
+        return Triple(hijriDay, hijriMonth, hijriYear)
+    }
+
+    fun getHijriDateString(calendar: Calendar = Calendar.getInstance(), dayOffset: Int = 0): String {
+        val (day, month, year) = getHijriDate(calendar, dayOffset)
+        val validMonth = (month - 1).coerceIn(0, 11)
         val monthName = HIJRI_MONTHS[validMonth]
-
-        return "$hijriDay $monthName $hijriYear H"
+        return "$day $monthName $year H"
     }
 }

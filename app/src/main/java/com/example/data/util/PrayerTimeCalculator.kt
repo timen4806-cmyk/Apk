@@ -27,7 +27,8 @@ object PrayerTimeCalculator {
         lat: Double = DEFAULT_LAT,
         lng: Double = DEFAULT_LNG,
         tz: Double = DEFAULT_TIMEZONE,
-        cityName: String = "Penancangan, Serang (Banten)"
+        cityName: String = "Penancangan, Serang (Banten)",
+        hijriOffset: Int = 0
     ): PrayerDaySchedule {
         val year = calendar.get(Calendar.YEAR)
         val month = calendar.get(Calendar.MONTH) + 1
@@ -80,7 +81,7 @@ object PrayerTimeCalculator {
 
         val masehiSdf = SimpleDateFormat("EEEE, d MMMM yyyy", Locale("id", "ID"))
         val dateMasehi = masehiSdf.format(calendar.time)
-        val dateHijri = HijriCalendarHelper.getHijriDateString(calendar)
+        val dateHijri = HijriCalendarHelper.getHijriDateString(calendar, hijriOffset)
 
         return PrayerDaySchedule(
             imsak = formatHour(imsakDecimal),

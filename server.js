@@ -26,6 +26,30 @@ let mosqueData = {
     theme: "Meneguhkan Ukhuwah Islamiyah dan Kesalehan Sosial di Era Digital",
     time: "11:45 WIB"
   },
+  eid: [
+    {
+      type: "Shalat Idul Fitri 1448 H",
+      khatib: "Prof. Dr. K.H. Tb. Mansyur, M.A.",
+      imam: "K.H. Tb. Abdul Qodir",
+      bilal: "Ust. Ahmad Rifai",
+      time: "06:45 WIB"
+    },
+    {
+      type: "Shalat Idul Adha 1448 H",
+      khatib: "Ust. Dr. H. Ahmad Fauzi, Lc., M.A.",
+      imam: "Ust. Drs. H. Marzuki",
+      bilal: "Kang Fajar Siddiq",
+      time: "06:30 WIB"
+    }
+  ],
+  iqomahDurations: {
+    Subuh: 12,
+    Dzuhur: 10,
+    Ashar: 10,
+    Maghrib: 8,
+    Isya: 10
+  },
+  hijriOffset: 0,
   announcements: [
     "Selamat datang di Masjid Jami' At-Taqwa Penancangan. Luruskan dan rapatkan shaf demi kesempurnaan shalat berjamaah.",
     "Mohon menonaktifkan atau mengheningkan nada dering handphone (HP) selama berada di dalam masjid.",
@@ -110,6 +134,10 @@ const server = http.createServer((req, res) => {
       try {
         const parsed = JSON.parse(body);
         if (parsed.officers) mosqueData.officers = parsed.officers;
+        if (parsed.friday) mosqueData.friday = parsed.friday;
+        if (parsed.eid) mosqueData.eid = parsed.eid;
+        if (parsed.iqomahDurations) mosqueData.iqomahDurations = parsed.iqomahDurations;
+        if (parsed.hijriOffset !== undefined) mosqueData.hijriOffset = parsed.hijriOffset;
         if (parsed.announcements) mosqueData.announcements = parsed.announcements;
         if (parsed.kas) mosqueData.kas = parsed.kas;
         res.writeHead(200, { 'Content-Type': 'application/json' });

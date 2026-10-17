@@ -27,6 +27,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.MainViewModel
 import com.example.data.model.DailyPrayerOfficer
+import com.example.data.model.EidSchedule
+import com.example.data.model.FridaySchedule
 import com.example.data.model.TransactionType
 import com.example.ui.theme.GoldAccent
 import com.example.ui.theme.NightSurface
@@ -38,6 +40,13 @@ fun AdminDashboardScreen(
 ) {
     val context = LocalContext.current
     val dailyOfficers by viewModel.dailyOfficers.collectAsState()
+    val fridaySchedule by viewModel.fridaySchedule.collectAsState()
+    val eidSchedules by viewModel.eidSchedules.collectAsState()
+    val iqomahDurations by viewModel.iqomahDurations.collectAsState()
+    val isIqomahCountingDown by viewModel.isIqomahCountingDown.collectAsState()
+    val iqomahCountdownText by viewModel.iqomahCountdownText.collectAsState()
+    val iqomahPrayerName by viewModel.iqomahPrayerName.collectAsState()
+    val isManualIqomahActive by viewModel.isManualIqomahActive.collectAsState()
     val announcements by viewModel.announcements.collectAsState()
     val isCloudSynced by viewModel.isCloudSynced.collectAsState()
     val lastSyncTime by viewModel.lastSyncTime.collectAsState()
@@ -51,6 +60,10 @@ fun AdminDashboardScreen(
     // Dialog States
     var showBroadcastDialog by remember { mutableStateOf(false) }
     var showEditOfficerDialog by remember { mutableStateOf<DailyPrayerOfficer?>(null) }
+    var showEditFridayDialog by remember { mutableStateOf(false) }
+    var showEditEidDialog by remember { mutableStateOf<EidSchedule?>(null) }
+    var showIqomahDurationsDialog by remember { mutableStateOf(false) }
+    var showManualIqomahDialog by remember { mutableStateOf(false) }
     var showAddAnnouncementDialog by remember { mutableStateOf(false) }
     var showAddKasDialog by remember { mutableStateOf(false) }
     var showAddAgendaDialog by remember { mutableStateOf(false) }
@@ -272,6 +285,272 @@ fun AdminDashboardScreen(
                                 )
                             }
                             Spacer(modifier = Modifier.height(6.dp))
+                        }
+                    }
+                }
+            }
+
+            // Action 2B: Kelola Petugas Shalat Jum'at (Khatib, Imam, Muadzin, Bilal)
+            item {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(containerColor = NightSurface),
+                    border = CardDefaults.outlinedCardBorder().copy(brush = Brush.horizontalGradient(listOf(GoldAccent, Color(0xFF10B981))))
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column {
+                                Text(
+                                    text = "Kelola Petugas Shalat Jum'at",
+                                    color = Color.White,
+                                    fontSize = 15.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                                Text(
+                                    text = "Khatib, Imam, Muadzin & Bilal",
+                                    color = Color(0xFF94A3B8),
+                                    fontSize = 11.sp
+                                )
+                            }
+                            FilledTonalButton(
+                                onClick = { showEditFridayDialog = true },
+                                colors = ButtonDefaults.filledTonalButtonColors(containerColor = Color(0xFF0F5A47), contentColor = GoldAccent),
+                                contentPadding = PaddingValues(horizontal = 10.dp, vertical = 4.dp),
+                                shape = RoundedCornerShape(6.dp)
+                            ) {
+                                Icon(imageVector = Icons.Default.Edit, contentDescription = null, modifier = Modifier.size(14.dp))
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(text = "Edit Jum'at", fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(10.dp))
+
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(Color(0xFF071911))
+                                .padding(12.dp)
+                        ) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text(text = "Judul Khutbah:", color = Color(0xFF94A3B8), fontSize = 11.sp)
+                                Text(text = fridaySchedule.time, color = Color(0xFF34D399), fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                            }
+                            Text(
+                                text = "“${fridaySchedule.khutbahTitle}”",
+                                color = GoldAccent,
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(vertical = 4.dp)
+                            )
+                            Divider(color = Color(0xFF1E4535), thickness = 0.5.dp, modifier = Modifier.padding(vertical = 4.dp))
+                            Text(text = "Khatib: ${fridaySchedule.khatib}", color = Color.White, fontSize = 12.sp)
+                            Text(text = "Imam: ${fridaySchedule.imam}", color = Color.White, fontSize = 12.sp)
+                            Text(text = "Muadzin: ${fridaySchedule.muadzin}", color = Color(0xFFCBD5E1), fontSize = 12.sp)
+                            Text(text = "Bilal: ${fridaySchedule.bilal}", color = Color(0xFFCBD5E1), fontSize = 12.sp)
+                        }
+                    }
+                }
+            }
+
+            // Action 2C: Kelola Petugas Shalat Hari Raya (Idul Fitri & Idul Adha)
+            item {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(containerColor = NightSurface),
+                    border = CardDefaults.outlinedCardBorder().copy(brush = Brush.horizontalGradient(listOf(Color(0xFF1E4535), Color(0xFF135841))))
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)
+                    ) {
+                        Text(
+                            text = "Kelola Petugas Shalat Hari Raya",
+                            color = Color.White,
+                            fontSize = 15.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(
+                            text = "Idul Fitri & Idul Adha (Khatib, Imam, Bilal, Jam)",
+                            color = Color(0xFF94A3B8),
+                            fontSize = 11.sp
+                        )
+
+                        Spacer(modifier = Modifier.height(10.dp))
+
+                        eidSchedules.forEach { eid ->
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .background(Color(0xFF071911))
+                                    .clickable { showEditEidDialog = eid }
+                                    .padding(12.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Text(text = eid.eidType, color = GoldAccent, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                                        Spacer(modifier = Modifier.width(6.dp))
+                                        Text(text = "(${eid.time})", color = Color(0xFF34D399), fontSize = 11.sp)
+                                    }
+                                    Text(text = "Khatib: ${eid.khatib} • Imam: ${eid.imam}", color = Color.White, fontSize = 12.sp)
+                                    Text(text = "Bilal: ${eid.bilal}", color = Color(0xFF94A3B8), fontSize = 11.sp)
+                                }
+                                Icon(
+                                    imageVector = Icons.Default.Edit,
+                                    contentDescription = "Edit Hari Raya",
+                                    tint = Color(0xFF6EE7B7),
+                                    modifier = Modifier.size(16.dp)
+                                )
+                            }
+                            Spacer(modifier = Modifier.height(6.dp))
+                        }
+                    }
+                }
+            }
+
+            // Action 2D: Fitur Iqomah & Hitung Mundur Manual
+            item {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(containerColor = NightSurface),
+                    border = CardDefaults.outlinedCardBorder().copy(brush = Brush.horizontalGradient(listOf(Color(0xFFEF4444), GoldAccent)))
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column {
+                                Text(
+                                    text = "Pengaturan & Hitung Mundur Iqomah",
+                                    color = Color.White,
+                                    fontSize = 15.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                                Text(
+                                    text = "Otomatis ba'da adzan & kontrol manual",
+                                    color = Color(0xFF94A3B8),
+                                    fontSize = 11.sp
+                                )
+                            }
+                            if (isIqomahCountingDown) {
+                                Box(
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(6.dp))
+                                        .background(Color(0xFFEF4444))
+                                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                                ) {
+                                    Text(text = "BERJALAN", color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.Black)
+                                }
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(10.dp))
+
+                        // Active countdown highlight banner
+                        if (isIqomahCountingDown) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .background(Color(0xFF7F1D1D))
+                                    .padding(12.dp)
+                            ) {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Column {
+                                        Text(text = "Hitung Mundur Iqomah $iqomahPrayerName:", color = Color(0xFFFCA5A5), fontSize = 11.sp)
+                                        Text(text = iqomahCountdownText, color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Black)
+                                    }
+                                    Button(
+                                        onClick = { viewModel.stopIqomah() },
+                                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEF4444)),
+                                        contentPadding = PaddingValues(horizontal = 10.dp, vertical = 4.dp),
+                                        shape = RoundedCornerShape(6.dp)
+                                    ) {
+                                        Text(text = "Hentikan", fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                                    }
+                                }
+                            }
+                            Spacer(modifier = Modifier.height(10.dp))
+                        }
+
+                        // Durations summary
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            val prayersList = listOf("Subuh", "Dzuhur", "Ashar", "Maghrib", "Isya")
+                            prayersList.forEach { p ->
+                                val dur = iqomahDurations[p] ?: 10
+                                Column(
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(6.dp))
+                                        .background(Color(0xFF071911))
+                                        .padding(horizontal = 8.dp, vertical = 6.dp)
+                                ) {
+                                    Text(text = p, color = Color(0xFF94A3B8), fontSize = 10.sp)
+                                    Text(text = "${dur}m", color = GoldAccent, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                                }
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Button(
+                                onClick = { showManualIqomahDialog = true },
+                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0F5A47)),
+                                modifier = Modifier.weight(1f),
+                                shape = RoundedCornerShape(8.dp)
+                            ) {
+                                Icon(imageVector = Icons.Default.HourglassTop, contentDescription = null, modifier = Modifier.size(14.dp))
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(text = "Mulai Iqomah Manual", fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                            }
+
+                            OutlinedButton(
+                                onClick = { showIqomahDurationsDialog = true },
+                                colors = ButtonDefaults.outlinedButtonColors(contentColor = GoldAccent),
+                                border = ButtonDefaults.outlinedButtonBorder().copy(brush = Brush.horizontalGradient(listOf(GoldAccent, Color(0xFF10B981)))),
+                                modifier = Modifier.weight(1f),
+                                shape = RoundedCornerShape(8.dp)
+                            ) {
+                                Icon(imageVector = Icons.Default.Settings, contentDescription = null, modifier = Modifier.size(14.dp))
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(text = "Edit Waktu Otomatis", fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                            }
                         }
                     }
                 }
@@ -550,6 +829,358 @@ fun AdminDashboardScreen(
             },
             dismissButton = {
                 TextButton(onClick = { showEditOfficerDialog = null }) {
+                    Text("Batal", color = Color(0xFF94A3B8))
+                }
+            }
+        )
+    }
+
+    // Dialog: Edit Petugas Shalat Jum'at
+    if (showEditFridayDialog) {
+        var khatib by remember { mutableStateOf(fridaySchedule.khatib) }
+        var imam by remember { mutableStateOf(fridaySchedule.imam) }
+        var muadzin by remember { mutableStateOf(fridaySchedule.muadzin) }
+        var bilal by remember { mutableStateOf(fridaySchedule.bilal) }
+        var khutbahTitle by remember { mutableStateOf(fridaySchedule.khutbahTitle) }
+        var time by remember { mutableStateOf(fridaySchedule.time) }
+
+        AlertDialog(
+            onDismissRequest = { showEditFridayDialog = false },
+            containerColor = Color(0xFF092017),
+            title = { Text(text = "Edit Petugas Shalat Jum'at", color = GoldAccent, fontWeight = FontWeight.Bold) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    OutlinedTextField(
+                        value = khutbahTitle,
+                        onValueChange = { khutbahTitle = it },
+                        label = { Text("Judul Khutbah Jum'at") },
+                        colors = OutlinedTextFieldDefaults.colors(focusedTextColor = Color.White, unfocusedTextColor = Color.White, focusedBorderColor = GoldAccent)
+                    )
+                    OutlinedTextField(
+                        value = khatib,
+                        onValueChange = { khatib = it },
+                        label = { Text("Nama Khatib") },
+                        singleLine = true,
+                        colors = OutlinedTextFieldDefaults.colors(focusedTextColor = Color.White, unfocusedTextColor = Color.White, focusedBorderColor = GoldAccent)
+                    )
+                    OutlinedTextField(
+                        value = imam,
+                        onValueChange = { imam = it },
+                        label = { Text("Nama Imam Shalat Jum'at") },
+                        singleLine = true,
+                        colors = OutlinedTextFieldDefaults.colors(focusedTextColor = Color.White, unfocusedTextColor = Color.White, focusedBorderColor = GoldAccent)
+                    )
+                    OutlinedTextField(
+                        value = muadzin,
+                        onValueChange = { muadzin = it },
+                        label = { Text("Nama Muadzin") },
+                        singleLine = true,
+                        colors = OutlinedTextFieldDefaults.colors(focusedTextColor = Color.White, unfocusedTextColor = Color.White, focusedBorderColor = GoldAccent)
+                    )
+                    OutlinedTextField(
+                        value = bilal,
+                        onValueChange = { bilal = it },
+                        label = { Text("Nama Bilal (Tarqie)") },
+                        singleLine = true,
+                        colors = OutlinedTextFieldDefaults.colors(focusedTextColor = Color.White, unfocusedTextColor = Color.White, focusedBorderColor = GoldAccent)
+                    )
+                    OutlinedTextField(
+                        value = time,
+                        onValueChange = { time = it },
+                        label = { Text("Waktu Pelaksanaan") },
+                        singleLine = true,
+                        colors = OutlinedTextFieldDefaults.colors(focusedTextColor = Color.White, unfocusedTextColor = Color.White, focusedBorderColor = GoldAccent)
+                    )
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        viewModel.updateFridaySchedule(
+                            fridaySchedule.copy(
+                                khatib = khatib,
+                                imam = imam,
+                                muadzin = muadzin,
+                                bilal = bilal,
+                                khutbahTitle = khutbahTitle,
+                                time = time
+                            )
+                        )
+                        showEditFridayDialog = false
+                        Toast.makeText(context, "Jadwal Petugas Shalat Jum'at berhasil disimpan!", Toast.LENGTH_SHORT).show()
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0F5A47))
+                ) {
+                    Text("Simpan")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showEditFridayDialog = false }) {
+                    Text("Batal", color = Color(0xFF94A3B8))
+                }
+            }
+        )
+    }
+
+    // Dialog: Edit Petugas Shalat Hari Raya
+    showEditEidDialog?.let { eid ->
+        var khatib by remember { mutableStateOf(eid.khatib) }
+        var imam by remember { mutableStateOf(eid.imam) }
+        var bilal by remember { mutableStateOf(eid.bilal) }
+        var time by remember { mutableStateOf(eid.time) }
+        var location by remember { mutableStateOf(eid.location) }
+        var notes by remember { mutableStateOf(eid.notes) }
+
+        AlertDialog(
+            onDismissRequest = { showEditEidDialog = null },
+            containerColor = Color(0xFF092017),
+            title = { Text(text = "Edit Petugas ${eid.eidType}", color = GoldAccent, fontWeight = FontWeight.Bold) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    OutlinedTextField(
+                        value = khatib,
+                        onValueChange = { khatib = it },
+                        label = { Text("Nama Khatib") },
+                        singleLine = true,
+                        colors = OutlinedTextFieldDefaults.colors(focusedTextColor = Color.White, unfocusedTextColor = Color.White, focusedBorderColor = GoldAccent)
+                    )
+                    OutlinedTextField(
+                        value = imam,
+                        onValueChange = { imam = it },
+                        label = { Text("Nama Imam") },
+                        singleLine = true,
+                        colors = OutlinedTextFieldDefaults.colors(focusedTextColor = Color.White, unfocusedTextColor = Color.White, focusedBorderColor = GoldAccent)
+                    )
+                    OutlinedTextField(
+                        value = bilal,
+                        onValueChange = { bilal = it },
+                        label = { Text("Nama Bilal") },
+                        singleLine = true,
+                        colors = OutlinedTextFieldDefaults.colors(focusedTextColor = Color.White, unfocusedTextColor = Color.White, focusedBorderColor = GoldAccent)
+                    )
+                    OutlinedTextField(
+                        value = time,
+                        onValueChange = { time = it },
+                        label = { Text("Jam / Waktu Shalat") },
+                        singleLine = true,
+                        colors = OutlinedTextFieldDefaults.colors(focusedTextColor = Color.White, unfocusedTextColor = Color.White, focusedBorderColor = GoldAccent)
+                    )
+                    OutlinedTextField(
+                        value = location,
+                        onValueChange = { location = it },
+                        label = { Text("Lokasi Shalat") },
+                        singleLine = true,
+                        colors = OutlinedTextFieldDefaults.colors(focusedTextColor = Color.White, unfocusedTextColor = Color.White, focusedBorderColor = GoldAccent)
+                    )
+                    OutlinedTextField(
+                        value = notes,
+                        onValueChange = { notes = it },
+                        label = { Text("Catatan / Himbauan Jemaah") },
+                        colors = OutlinedTextFieldDefaults.colors(focusedTextColor = Color.White, unfocusedTextColor = Color.White, focusedBorderColor = GoldAccent)
+                    )
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        viewModel.updateEidSchedule(
+                            eid.copy(
+                                khatib = khatib,
+                                imam = imam,
+                                bilal = bilal,
+                                time = time,
+                                location = location,
+                                notes = notes
+                            )
+                        )
+                        showEditEidDialog = null
+                        Toast.makeText(context, "Jadwal ${eid.eidType} berhasil disimpan!", Toast.LENGTH_SHORT).show()
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0F5A47))
+                ) {
+                    Text("Simpan")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showEditEidDialog = null }) {
+                    Text("Batal", color = Color(0xFF94A3B8))
+                }
+            }
+        )
+    }
+
+    // Dialog: Edit Durasi Otomatis Iqomah
+    if (showIqomahDurationsDialog) {
+        var subuhDur by remember { mutableStateOf((iqomahDurations["Subuh"] ?: 12).toString()) }
+        var dzuhurDur by remember { mutableStateOf((iqomahDurations["Dzuhur"] ?: 10).toString()) }
+        var asharDur by remember { mutableStateOf((iqomahDurations["Ashar"] ?: 10).toString()) }
+        var maghribDur by remember { mutableStateOf((iqomahDurations["Maghrib"] ?: 8).toString()) }
+        var isyaDur by remember { mutableStateOf((iqomahDurations["Isya"] ?: 10).toString()) }
+
+        AlertDialog(
+            onDismissRequest = { showIqomahDurationsDialog = false },
+            containerColor = Color(0xFF092017),
+            title = { Text(text = "Pengaturan Waktu Tunggu Iqomah", color = GoldAccent, fontWeight = FontWeight.Bold) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(text = "Tentukan waktu jeda (menit) antara adzan dan iqomah untuk masing-masing waktu shalat:", color = Color(0xFF94A3B8), fontSize = 12.sp)
+
+                    listOf(
+                        "Subuh" to subuhDur,
+                        "Dzuhur" to dzuhurDur,
+                        "Ashar" to asharDur,
+                        "Maghrib" to maghribDur,
+                        "Isya" to isyaDur
+                    ).forEach { (name, _) ->
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(text = "Shalat $name", color = Color.White, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+                            OutlinedTextField(
+                                value = when (name) {
+                                    "Subuh" -> subuhDur
+                                    "Dzuhur" -> dzuhurDur
+                                    "Ashar" -> asharDur
+                                    "Maghrib" -> maghribDur
+                                    else -> isyaDur
+                                },
+                                onValueChange = { newVal ->
+                                    val digits = newVal.filter { it.isDigit() }.take(2)
+                                    when (name) {
+                                        "Subuh" -> subuhDur = digits
+                                        "Dzuhur" -> dzuhurDur = digits
+                                        "Ashar" -> asharDur = digits
+                                        "Maghrib" -> maghribDur = digits
+                                        "Isya" -> isyaDur = digits
+                                    }
+                                },
+                                modifier = Modifier.width(110.dp),
+                                singleLine = true,
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                                suffix = { Text("menit", fontSize = 10.sp) },
+                                colors = OutlinedTextFieldDefaults.colors(focusedTextColor = Color.White, unfocusedTextColor = Color.White, focusedBorderColor = GoldAccent)
+                            )
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        viewModel.updateIqomahDuration("Subuh", subuhDur.toIntOrNull() ?: 12)
+                        viewModel.updateIqomahDuration("Dzuhur", dzuhurDur.toIntOrNull() ?: 10)
+                        viewModel.updateIqomahDuration("Ashar", asharDur.toIntOrNull() ?: 10)
+                        viewModel.updateIqomahDuration("Maghrib", maghribDur.toIntOrNull() ?: 8)
+                        viewModel.updateIqomahDuration("Isya", isyaDur.toIntOrNull() ?: 10)
+                        showIqomahDurationsDialog = false
+                        Toast.makeText(context, "Pengaturan durasi Iqomah disimpan!", Toast.LENGTH_SHORT).show()
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0F5A47))
+                ) {
+                    Text("Simpan")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showIqomahDurationsDialog = false }) {
+                    Text("Batal", color = Color(0xFF94A3B8))
+                }
+            }
+        )
+    }
+
+    // Dialog: Mulai Hitung Mundur Iqomah Manual
+    if (showManualIqomahDialog) {
+        var selectedPrayer by remember { mutableStateOf("Maghrib") }
+        var minutesStr by remember { mutableStateOf("10") }
+        var secondsStr by remember { mutableStateOf("00") }
+
+        AlertDialog(
+            onDismissRequest = { showManualIqomahDialog = false },
+            containerColor = Color(0xFF092017),
+            title = { Text(text = "Mulai Hitung Mundur Iqomah Manual", color = GoldAccent, fontWeight = FontWeight.Bold) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Text(text = "Atur waktu hitung mundur manual saat shalat akan segera didirikan:", color = Color(0xFF94A3B8), fontSize = 12.sp)
+
+                    Text(text = "Pilih Waktu Shalat:", color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        listOf("Subuh", "Dzuhur", "Ashar", "Maghrib", "Isya").forEach { p ->
+                            FilterChip(
+                                selected = selectedPrayer == p,
+                                onClick = {
+                                    selectedPrayer = p
+                                    minutesStr = (iqomahDurations[p] ?: 10).toString()
+                                },
+                                label = { Text(p, fontSize = 10.sp) },
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(4.dp))
+
+                    Text(text = "Setel Hitungan Mundur (Menit & Detik):", color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(10.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        OutlinedTextField(
+                            value = minutesStr,
+                            onValueChange = { minutesStr = it.filter { char -> char.isDigit() }.take(2) },
+                            label = { Text("Menit") },
+                            modifier = Modifier.weight(1f),
+                            singleLine = true,
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                            colors = OutlinedTextFieldDefaults.colors(focusedTextColor = Color.White, unfocusedTextColor = Color.White, focusedBorderColor = GoldAccent)
+                        )
+                        Text(text = ":", color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                        OutlinedTextField(
+                            value = secondsStr,
+                            onValueChange = { secondsStr = it.filter { char -> char.isDigit() }.take(2) },
+                            label = { Text("Detik") },
+                            modifier = Modifier.weight(1f),
+                            singleLine = true,
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                            colors = OutlinedTextFieldDefaults.colors(focusedTextColor = Color.White, unfocusedTextColor = Color.White, focusedBorderColor = GoldAccent)
+                        )
+                    }
+
+                    // Quick buttons
+                    Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                        listOf(3, 5, 7, 10, 15).forEach { mins ->
+                            AssistChip(
+                                onClick = {
+                                    minutesStr = mins.toString()
+                                    secondsStr = "00"
+                                },
+                                label = { Text("${mins}m", fontSize = 11.sp) }
+                            )
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        val m = minutesStr.toIntOrNull() ?: 10
+                        val s = secondsStr.toIntOrNull() ?: 0
+                        viewModel.startManualIqomah(selectedPrayer, m, s)
+                        showManualIqomahDialog = false
+                        Toast.makeText(context, "Hitung mundur Iqomah $selectedPrayer dimulai ($m menit $s detik)!", Toast.LENGTH_SHORT).show()
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEF4444))
+                ) {
+                    Text("Mulai Hitung Mundur")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showManualIqomahDialog = false }) {
                     Text("Batal", color = Color(0xFF94A3B8))
                 }
             }

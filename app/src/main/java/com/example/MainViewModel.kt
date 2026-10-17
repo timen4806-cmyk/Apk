@@ -76,12 +76,54 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val dailyOfficers: StateFlow<List<DailyPrayerOfficer>> = repository.dailyOfficers
     val fridaySchedule: StateFlow<FridaySchedule> = repository.fridaySchedule
     val eidSchedules: StateFlow<List<EidSchedule>> = repository.eidSchedules
+    val iqomahDurations: StateFlow<Map<String, Int>> = repository.iqomahDurations
     val announcements: StateFlow<List<Announcement>> = repository.announcements
     val kasTransactions: StateFlow<List<KasItem>> = repository.kasTransactions
     val agendas: StateFlow<List<AgendaItem>> = repository.agendas
     val galleryItems: StateFlow<List<GalleryItem>> = repository.galleryItems
     val isCloudSynced: StateFlow<Boolean> = repository.isCloudSynced
     val lastSyncTime: StateFlow<String> = repository.lastSyncTime
+
+    // Manual Iqomah Controller
+    private var manualIqomahJob: kotlinx.coroutines.Job? = null
+    private val _isManualIqomahActive = MutableStateFlow(false)
+    val isManualIqomahActive: StateFlow<Boolean> = _isManualIqomahActive.asStateFlow()
+
+    fun startManualIqomah(prayerName: String, minutes: Int, seconds: Int = 0) {
+        manualIqomahJob?.cancel()
+        _isManualIqomahActive.value = true
+        _isIqomahCountingDown.value = true
+        _iqomahPrayerName.value = prayerName
+        manualIqomahJob = viewModelScope.launch {
+            var totalRemaining = minutes * 60 + seconds
+            while (totalRemaining >= 0) {
+                val m = totalRemaining / 60
+                val s = totalRemaining % 60
+                _iqomahCountdownText.value = String.format(Locale.ROOT, "%02d:%02d", m, s)
+                if (totalRemaining == 0) {
+                    NotificationHelper.showIqomahReminder(getApplication(), prayerName, 0)
+                    break
+                }
+                delay(1000L)
+                totalRemaining--
+            }
+            delay(5000L) // Keep 00:00 visible for 5s
+            _isIqomahCountingDown.value = false
+            _isManualIqomahActive.value = false
+            _iqomahCountdownText.value = ""
+        }
+    }
+
+    fun stopIqomah() {
+        manualIqomahJob?.cancel()
+        _isManualIqomahActive.value = false
+        _isIqomahCountingDown.value = false
+        _iqomahCountdownText.value = ""
+    }
+
+    fun updateIqomahDuration(prayerName: String, minutes: Int) {
+        repository.updateIqomahDuration(prayerName, minutes)
+    }
 
     init {
         NotificationHelper.createNotificationChannels(application)
@@ -114,33 +156,36 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val currentMinutesOfDay = now.get(Calendar.HOUR_OF_DAY) * 60 + now.get(Calendar.MINUTE)
         val currentSeconds = now.get(Calendar.SECOND)
 
+        val durationMap = repository.iqomahDurations.value
         val prayers = listOf(
-            Triple("Subuh", parseTimeToMinutes(schedule.subuh), 12),
-            Triple("Dzuhur", parseTimeToMinutes(schedule.dzuhur), 10),
-            Triple("Ashar", parseTimeToMinutes(schedule.ashar), 10),
-            Triple("Maghrib", parseTimeToMinutes(schedule.maghrib), 8),
-            Triple("Isya", parseTimeToMinutes(schedule.isya), 10)
+            Triple("Subuh", parseTimeToMinutes(schedule.subuh), durationMap["Subuh"] ?: 12),
+            Triple("Dzuhur", parseTimeToMinutes(schedule.dzuhur), durationMap["Dzuhur"] ?: 10),
+            Triple("Ashar", parseTimeToMinutes(schedule.ashar), durationMap["Ashar"] ?: 10),
+            Triple("Maghrib", parseTimeToMinutes(schedule.maghrib), durationMap["Maghrib"] ?: 8),
+            Triple("Isya", parseTimeToMinutes(schedule.isya), durationMap["Isya"] ?: 10)
         )
 
-        // Check if currently inside Iqomah waiting window
-        var insideIqomah = false
-        for ((name, prayerMin, iqomahWait) in prayers) {
-            val iqomahEndMin = prayerMin + iqomahWait
-            if (currentMinutesOfDay >= prayerMin && currentMinutesOfDay < iqomahEndMin) {
-                insideIqomah = true
-                val remainingSec = (iqomahEndMin * 60) - (currentMinutesOfDay * 60 + currentSeconds)
-                val remMin = remainingSec / 60
-                val remSec = remainingSec % 60
-                _isIqomahCountingDown.value = true
-                _iqomahPrayerName.value = name
-                _iqomahCountdownText.value = String.format(Locale.ROOT, "%02d:%02d", remMin, remSec)
-                break
+        // Check if manual iqomah is currently active
+        if (!_isManualIqomahActive.value) {
+            var insideIqomah = false
+            for ((name, prayerMin, iqomahWait) in prayers) {
+                val iqomahEndMin = prayerMin + iqomahWait
+                if (currentMinutesOfDay >= prayerMin && currentMinutesOfDay < iqomahEndMin) {
+                    insideIqomah = true
+                    val remainingSec = (iqomahEndMin * 60) - (currentMinutesOfDay * 60 + currentSeconds)
+                    val remMin = remainingSec / 60
+                    val remSec = remainingSec % 60
+                    _isIqomahCountingDown.value = true
+                    _iqomahPrayerName.value = name
+                    _iqomahCountdownText.value = String.format(Locale.ROOT, "%02d:%02d", remMin, remSec)
+                    break
+                }
             }
-        }
 
-        if (!insideIqomah) {
-            _isIqomahCountingDown.value = false
-            _iqomahCountdownText.value = ""
+            if (!insideIqomah) {
+                _isIqomahCountingDown.value = false
+                _iqomahCountdownText.value = ""
+            }
         }
 
         // Find next prayer

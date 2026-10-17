@@ -17,16 +17,20 @@ class MosqueRepository(context: Context) {
         context.getSharedPreferences("masjid_attaqwa_prefs", Context.MODE_PRIVATE)
 
     // Daily Officer Schedules
-    private val _dailyOfficers = MutableStateFlow<List<DailyPrayerOfficer>>(getInitialDailyOfficers())
+    private val _dailyOfficers = MutableStateFlow<List<DailyPrayerOfficer>>(loadDailyOfficers())
     val dailyOfficers: StateFlow<List<DailyPrayerOfficer>> = _dailyOfficers.asStateFlow()
 
     // Friday Schedule
-    private val _fridaySchedule = MutableStateFlow<FridaySchedule>(getInitialFridaySchedule())
+    private val _fridaySchedule = MutableStateFlow<FridaySchedule>(loadFridaySchedule())
     val fridaySchedule: StateFlow<FridaySchedule> = _fridaySchedule.asStateFlow()
 
     // Eid Schedules
-    private val _eidSchedules = MutableStateFlow<List<EidSchedule>>(getInitialEidSchedules())
+    private val _eidSchedules = MutableStateFlow<List<EidSchedule>>(loadEidSchedules())
     val eidSchedules: StateFlow<List<EidSchedule>> = _eidSchedules.asStateFlow()
+
+    // Iqomah Durations (in minutes) for each prayer
+    private val _iqomahDurations = MutableStateFlow<Map<String, Int>>(loadIqomahDurations())
+    val iqomahDurations: StateFlow<Map<String, Int>> = _iqomahDurations.asStateFlow()
 
     // Announcements / Running Text
     private val _announcements = MutableStateFlow<List<Announcement>>(getInitialAnnouncements())
@@ -58,6 +62,7 @@ class MosqueRepository(context: Context) {
         if (index != -1) {
             current[index] = updated
             _dailyOfficers.value = current
+            saveDailyOfficers(current)
             triggerCloudSync()
         }
     }
@@ -65,6 +70,7 @@ class MosqueRepository(context: Context) {
     // Friday Schedule Management
     fun updateFridaySchedule(updated: FridaySchedule) {
         _fridaySchedule.value = updated
+        saveFridaySchedule(updated)
         triggerCloudSync()
     }
 
@@ -75,8 +81,18 @@ class MosqueRepository(context: Context) {
         if (index != -1) {
             current[index] = updated
             _eidSchedules.value = current
+            saveEidSchedules(current)
             triggerCloudSync()
         }
+    }
+
+    // Iqomah Duration Management (in minutes)
+    fun updateIqomahDuration(prayerName: String, minutes: Int) {
+        val current = _iqomahDurations.value.toMutableMap()
+        current[prayerName] = minutes.coerceAtLeast(1)
+        _iqomahDurations.value = current
+        saveIqomahDurations(current)
+        triggerCloudSync()
     }
 
     // Running Text Announcements Management
@@ -333,5 +349,169 @@ class MosqueRepository(context: Context) {
                 description = "Aksi bersih-bersih karpet masjid, area wudhu, dan penataan taman hijau oleh RISMA (Remaja Islam Masjid At-Taqwa)."
             )
         )
+    }
+
+    // Persistence Helpers
+    private fun loadDailyOfficers(): List<DailyPrayerOfficer> {
+        val jsonStr = prefs.getString("saved_daily_officers", null) ?: return getInitialDailyOfficers()
+        return try {
+            val array = org.json.JSONArray(jsonStr)
+            val list = mutableListOf<DailyPrayerOfficer>()
+            for (i in 0 until array.length()) {
+                val obj = array.getJSONObject(i)
+                list.add(
+                    DailyPrayerOfficer(
+                        id = obj.getString("id"),
+                        prayerName = obj.getString("prayerName"),
+                        imam = obj.getString("imam"),
+                        muadzin = obj.getString("muadzin"),
+                        bilal = obj.getString("bilal"),
+                        notes = obj.optString("notes", "Siap Bertugas"),
+                        isConfirmed = obj.optBoolean("isConfirmed", true)
+                    )
+                )
+            }
+            if (list.isNotEmpty()) list else getInitialDailyOfficers()
+        } catch (e: Exception) {
+            getInitialDailyOfficers()
+        }
+    }
+
+    private fun saveDailyOfficers(list: List<DailyPrayerOfficer>) {
+        try {
+            val array = org.json.JSONArray()
+            for (item in list) {
+                val obj = org.json.JSONObject()
+                obj.put("id", item.id)
+                obj.put("prayerName", item.prayerName)
+                obj.put("imam", item.imam)
+                obj.put("muadzin", item.muadzin)
+                obj.put("bilal", item.bilal)
+                obj.put("notes", item.notes)
+                obj.put("isConfirmed", item.isConfirmed)
+                array.put(obj)
+            }
+            prefs.edit().putString("saved_daily_officers", array.toString()).apply()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    private fun loadFridaySchedule(): FridaySchedule {
+        val jsonStr = prefs.getString("saved_friday_schedule", null) ?: return getInitialFridaySchedule()
+        return try {
+            val obj = org.json.JSONObject(jsonStr)
+            FridaySchedule(
+                id = obj.optString("id", "friday_current"),
+                date = obj.optString("date", "Jum'at Pekan Ini"),
+                khatib = obj.getString("khatib"),
+                imam = obj.getString("imam"),
+                muadzin = obj.getString("muadzin"),
+                bilal = obj.getString("bilal"),
+                khutbahTitle = obj.optString("khutbahTitle", ""),
+                time = obj.optString("time", "11:45 WIB (Adzan Pertama)")
+            )
+        } catch (e: Exception) {
+            getInitialFridaySchedule()
+        }
+    }
+
+    private fun saveFridaySchedule(friday: FridaySchedule) {
+        try {
+            val obj = org.json.JSONObject()
+            obj.put("id", friday.id)
+            obj.put("date", friday.date)
+            obj.put("khatib", friday.khatib)
+            obj.put("imam", friday.imam)
+            obj.put("muadzin", friday.muadzin)
+            obj.put("bilal", friday.bilal)
+            obj.put("khutbahTitle", friday.khutbahTitle)
+            obj.put("time", friday.time)
+            prefs.edit().putString("saved_friday_schedule", obj.toString()).apply()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    private fun loadEidSchedules(): List<EidSchedule> {
+        val jsonStr = prefs.getString("saved_eid_schedules", null) ?: return getInitialEidSchedules()
+        return try {
+            val array = org.json.JSONArray(jsonStr)
+            val list = mutableListOf<EidSchedule>()
+            for (i in 0 until array.length()) {
+                val obj = array.getJSONObject(i)
+                list.add(
+                    EidSchedule(
+                        id = obj.getString("id"),
+                        eidType = obj.getString("eidType"),
+                        date = obj.getString("date"),
+                        time = obj.optString("time", "06:30 WIB"),
+                        khatib = obj.getString("khatib"),
+                        imam = obj.getString("imam"),
+                        bilal = obj.getString("bilal"),
+                        location = obj.optString("location", "Ruang Utama & Pelataran Masjid Jami' At-Taqwa"),
+                        notes = obj.optString("notes", "")
+                    )
+                )
+            }
+            if (list.isNotEmpty()) list else getInitialEidSchedules()
+        } catch (e: Exception) {
+            getInitialEidSchedules()
+        }
+    }
+
+    private fun saveEidSchedules(list: List<EidSchedule>) {
+        try {
+            val array = org.json.JSONArray()
+            for (item in list) {
+                val obj = org.json.JSONObject()
+                obj.put("id", item.id)
+                obj.put("eidType", item.eidType)
+                obj.put("date", item.date)
+                obj.put("time", item.time)
+                obj.put("khatib", item.khatib)
+                obj.put("imam", item.imam)
+                obj.put("bilal", item.bilal)
+                obj.put("location", item.location)
+                obj.put("notes", item.notes)
+                array.put(obj)
+            }
+            prefs.edit().putString("saved_eid_schedules", array.toString()).apply()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    private fun loadIqomahDurations(): Map<String, Int> {
+        val defaults = mapOf(
+            "Subuh" to 12,
+            "Dzuhur" to 10,
+            "Ashar" to 10,
+            "Maghrib" to 8,
+            "Isya" to 10
+        )
+        val jsonStr = prefs.getString("saved_iqomah_durations", null) ?: return defaults
+        return try {
+            val obj = org.json.JSONObject(jsonStr)
+            val map = mutableMapOf<String, Int>()
+            val keys = obj.keys()
+            while (keys.hasNext()) {
+                val key = keys.next()
+                map[key] = obj.getInt(key)
+            }
+            if (map.isNotEmpty()) map else defaults
+        } catch (e: Exception) {
+            defaults
+        }
+    }
+
+    private fun saveIqomahDurations(map: Map<String, Int>) {
+        try {
+            val obj = org.json.JSONObject()
+            map.forEach { (k, v) -> obj.put(k, v) }
+            prefs.edit().putString("saved_iqomah_durations", obj.toString()).apply()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 }

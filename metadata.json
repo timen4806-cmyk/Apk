@@ -1,0 +1,6 @@
+{
+  "name": "Jami' At-Taqwa",
+  "description": "Aplikasi Jadwal Shalat Kemenag RI, Petugas Shalat, Jam Digital TV Masjid, Kas, Kegiatan, dan Donasi Masjid Jami' At-Taqwa Penancangan.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
